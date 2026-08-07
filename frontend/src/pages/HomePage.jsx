@@ -19,7 +19,7 @@ function StatCard({ label, value, sub, positive, empty }) {
         <p className="text-2xl font-bold text-slate-200">—</p>
       ) : (
         <>
-          <p className={`text-2xl font-bold ${positive === true ? 'text-positive-600' : positive === false ? 'text-negative-600' : 'text-slate-800'}`}>
+          <p className={`text-2xl font-bold ${positive === true ? 'text-positive-600' : positive === false ? 'text-negative-600' : 'text-slate-800 dark:text-slate-100'}`}>
             {value}
           </p>
           {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
@@ -90,7 +90,7 @@ export default function HomePage() {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-slate-400">{greet()}</p>
-          <h1 className="text-2xl font-bold text-slate-800 mt-0.5">{currentUser.name}</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-0.5">{currentUser.name}</h1>
         </div>
         {netByCurrency.length > 0 && (
           <div className="text-right">
@@ -131,7 +131,7 @@ export default function HomePage() {
       {/* Group breakdown */}
       {summary?.group_balances?.length > 0 && (
         <div className="card p-5">
-          <h2 className="text-sm font-semibold text-slate-700 mb-4">By group</h2>
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">By group</h2>
           <div className="space-y-1">
             {summary.group_balances.map((g) => {
               const bal = parseFloat(g.balance)
@@ -140,12 +140,12 @@ export default function HomePage() {
                 <Link
                   key={g.group_id}
                   to={`/groups/${g.group_id}`}
-                  className="flex items-center gap-3 -mx-2 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+                  className="flex items-center gap-3 -mx-2 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:hover:bg-slate-700/50 transition-colors group"
                 >
                   <div className={`w-8 h-8 rounded-lg ${groupColor(g.group_id)} flex items-center justify-center text-white font-bold text-xs flex-none`}>
                     {group?.emoji || g.group_name?.charAt(0)?.toUpperCase()}
                   </div>
-                  <span className="flex-1 text-sm font-medium text-slate-700 group-hover:text-slate-900">{g.group_name}</span>
+                  <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-slate-900">{g.group_name}</span>
                   <span className={`text-sm font-semibold ${
                     bal > 0.005 ? 'text-positive-600' : bal < -0.005 ? 'text-negative-600' : 'text-slate-400'
                   }`}>
@@ -161,11 +161,11 @@ export default function HomePage() {
 
       {/* Empty state */}
       {groups.length === 0 && (
-        <div className="card border-dashed border-2 border-slate-200 p-12 text-center">
+        <div className="card border-dashed border-2 border-slate-200 dark:border-slate-600 p-12 text-center">
           <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center mx-auto mb-4">
             <Zap size={22} className="text-brand-500" />
           </div>
-          <p className="text-slate-700 font-semibold">No groups yet</p>
+          <p className="text-slate-700 dark:text-slate-200 font-semibold">No groups yet</p>
           <p className="text-slate-400 text-sm mt-1">Create a group using the sidebar to start splitting.</p>
         </div>
       )}
@@ -173,7 +173,7 @@ export default function HomePage() {
       {/* Recent activity */}
       {activity.length > 0 && (
         <div className="card p-5">
-          <h2 className="text-sm font-semibold text-slate-700 mb-4">Recent activity</h2>
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Recent activity</h2>
           <ActivityFeed logs={activity.slice(0, 12)} />
         </div>
       )}

@@ -54,11 +54,11 @@ export default function InvitePage() {
             <div className="w-9 h-9 rounded-2xl bg-brand-500 flex items-center justify-center shadow-lg shadow-brand-500/30">
               <span className="text-white font-bold">S</span>
             </div>
-            <span className="text-xl font-bold text-white">SplitEase</span>
+            <span className="text-xl font-bold text-white">Split Striker</span>
           </div>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-modal">
+        <div className="bg-white dark:bg-slate-800/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-modal">
           {loading && (
             <div className="flex flex-col items-center py-10">
               <Loader2 size={28} className="text-brand-400 animate-spin mb-3" />

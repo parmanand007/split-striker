@@ -173,7 +173,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
       <form onSubmit={submit} className="space-y-5">
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Description</label>
           <input
             autoFocus
             value={desc}
@@ -189,7 +189,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
         {/* Amount + currency */}
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Amount</label>
             <input
               type="number"
               step="0.01"
@@ -201,7 +201,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Currency</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Currency</label>
             <input
               value={currency}
               onChange={(e) => setCurrency(e.target.value.toUpperCase().slice(0, 3))}
@@ -232,7 +232,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
         )}
 
         {/* Negative/refund */}
-        <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200 cursor-pointer">
           <input type="checkbox" checked={isNegative} onChange={(e) => setIsNegative(e.target.checked)} className="accent-brand-600" />
           This is a refund / adjustment (negative amount)
         </label>
@@ -240,8 +240,8 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
         {/* Paid by */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-slate-700">Paid by</label>
-            <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Paid by</label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 cursor-pointer">
               <input type="checkbox" checked={multiplePayers} onChange={(e) => setMultiplePayers(e.target.checked)} className="accent-brand-600" />
               Multiple payers
             </label>
@@ -285,7 +285,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
 
         {/* Split type */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Split type</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Split type</label>
           <div className="flex gap-2 flex-wrap">
             {SPLIT_TYPES.map((st) => (
               <button
@@ -295,7 +295,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   splitType === st.value
                     ? 'bg-brand-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                 }`}
               >
                 {st.label}
@@ -306,7 +306,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
 
         {/* Split among */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Split among</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Split among</label>
           <div className="space-y-1">
             {members.map((m) => {
               const sid = String(m.id)
@@ -353,14 +353,14 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
         {/* Category + date */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
               <option value="">— none —</option>
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Date</label>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input" />
           </div>
         </div>
@@ -368,7 +368,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
         {/* Recurrence */}
         {!isEditing && (
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Repeat</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Repeat</label>
             <div className="flex gap-2 items-center">
               <select
                 value={recurrenceRule}
@@ -395,7 +395,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
         {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-slate-100">
             Cancel
           </button>
           <button

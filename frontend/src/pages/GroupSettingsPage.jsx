@@ -134,7 +134,7 @@ export default function GroupSettingsPage() {
           <ArrowLeft size={16} />
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Group settings</h1>
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Group settings</h1>
           <p className="text-xs text-slate-400">{group.name}</p>
         </div>
       </div>
@@ -148,19 +148,19 @@ export default function GroupSettingsPage() {
           </div>
           <div className="space-y-3">
             {pendingRequests.map(req => (
-              <div key={req.id} className="bg-white rounded-xl border border-amber-200 p-4">
+              <div key={req.id} className="bg-white dark:bg-slate-800 rounded-xl border border-amber-200 p-4">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">"{req.expense_description}"</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Requested by <span className="font-medium text-slate-600">{req.requested_by_name}</span></p>
-                    {req.message && <p className="text-xs text-slate-500 mt-1 italic">"{req.message}"</p>}
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">"{req.expense_description}"</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Requested by <span className="font-medium text-slate-600 dark:text-slate-300">{req.requested_by_name}</span></p>
+                    {req.message && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">"{req.message}"</p>}
                   </div>
                 </div>
                 {/* Proposed changes */}
-                <div className="bg-slate-50 rounded-lg p-3 mb-3">
-                  <p className="text-xs font-semibold text-slate-500 mb-1.5">Proposed changes</p>
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 mb-3">
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Proposed changes</p>
                   {Object.entries(req.proposed_changes).map(([k, v]) => (
-                    <p key={k} className="text-xs text-slate-700"><span className="font-medium capitalize">{k}:</span> {String(v)}</p>
+                    <p key={k} className="text-xs text-slate-700 dark:text-slate-200"><span className="font-medium capitalize">{k}:</span> {String(v)}</p>
                   ))}
                 </div>
                 <div className="flex gap-2">
@@ -187,29 +187,29 @@ export default function GroupSettingsPage() {
 
       {/* Settings form */}
       <div className="card p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-700">General</h2>
+        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">General</h2>
         <form onSubmit={saveSettings} className="space-y-4">
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Group name</label>
+              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Group name</label>
               <input value={name} onChange={e => setName(e.target.value)} className="input" />
             </div>
             <div className="w-24">
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">Emoji</label>
+              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Emoji</label>
               <input value={emoji} onChange={e => setEmoji(e.target.value)} className="input text-center text-lg" placeholder="✈️" maxLength={2} />
             </div>
           </div>
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" checked={archived} onChange={e => setArchived(e.target.checked)} className="accent-brand-600 w-4 h-4 rounded" />
             <div>
-              <span className="text-sm font-medium text-slate-700">Archive group</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Archive group</span>
               <p className="text-xs text-slate-400">No new expenses or payments.</p>
             </div>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" checked={simplify} onChange={e => setSimplify(e.target.checked)} className="accent-brand-600 w-4 h-4 rounded" />
             <div>
-              <span className="text-sm font-medium text-slate-700">Simplify debts</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Simplify debts</span>
               <p className="text-xs text-slate-400">Show fewest possible transactions to settle up.</p>
             </div>
           </label>
@@ -224,8 +224,8 @@ export default function GroupSettingsPage() {
       {/* Invite link */}
       <div className="card p-5">
         <div className="flex items-center gap-2 mb-3">
-          <Link2 size={15} className="text-slate-500" />
-          <h2 className="text-sm font-semibold text-slate-700">Invite link</h2>
+          <Link2 size={15} className="text-slate-500 dark:text-slate-400" />
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Invite link</h2>
         </div>
         <p className="text-xs text-slate-400 mb-3">Share this link. Anyone with it can join the group. Expires in 7 days.</p>
         {inviteLink ? (
@@ -257,7 +257,7 @@ export default function GroupSettingsPage() {
 
       {/* Members */}
       <div className="card p-5">
-        <h2 className="text-sm font-semibold text-slate-700 mb-4">Members ({group.members.length})</h2>
+        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Members ({group.members.length})</h2>
         <div className="space-y-2 mb-4">
           {group.members.map(m => (
             <div key={m.id} className="flex items-center justify-between py-1">
@@ -266,7 +266,7 @@ export default function GroupSettingsPage() {
                   {m.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     {m.name}
                     {m.id === currentUser.id && <span className="ml-1 text-xs text-slate-400">(you)</span>}
                     {m.id === group.created_by_id && <span className="ml-1 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md font-semibold">owner</span>}
@@ -288,7 +288,7 @@ export default function GroupSettingsPage() {
         </div>
 
         {nonMembers.length > 0 && isOwner && (
-          <form onSubmit={addMember} className="flex gap-2 pt-3 border-t border-slate-100">
+          <form onSubmit={addMember} className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
             <select value={addUserId} onChange={e => setAddUserId(e.target.value)} className="input flex-1 text-sm">
               <option value="">Add a member…</option>
               {nonMembers.map(u => (

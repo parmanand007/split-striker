@@ -8,19 +8,26 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User, Group, Expense, Payment
-from schemas import UserCreate, UserOut, UserSummary
+from schemas import UserCreate, UserOut, UserSummary, LoginByEmail
 from services.balance_calculator import compute_net_balances
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
 
+@router.post("/login", response_model=UserOut)
+def login_by_email(body: LoginByEmail, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == body.email.strip().lower()).first()
+    if not user:
+        raise HTTPException(404, "No account found with this email.")
+    return user
+
 @router.post("", response_model=UserOut, status_code=201)
 def create_user(body: UserCreate, db: Session = Depends(get_db)):
-    if body.email:
-        existing = db.query(User).filter(User.email == body.email).first()
-        if existing:
-            raise HTTPException(400, f"Email {body.email} already registered.")
-    user = User(name=body.name, email=body.email or None)
+    email = body.email.strip().lower()
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        raise HTTPException(400, "An account with this email already exists.")
+    user = User(name=body.name, email=email)
     db.add(user)
     db.commit()
     db.refresh(user)

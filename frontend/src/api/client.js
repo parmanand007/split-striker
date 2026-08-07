@@ -17,8 +17,8 @@ async function req(method, path, body) {
 
 export const api = {
   // Users
-  getUsers: () => req('GET', '/users'),
-  createUser: (name, email) => req('POST', '/users', { name, email: email || null }),
+  loginByEmail: (email) => req('POST', '/users/login', { email }),
+  createUser: (name, email) => req('POST', '/users', { name, email }),
   getUser: (id) => req('GET', `/users/${id}`),
   getUserSummary: (id) => req('GET', `/users/${id}/summary`),
   getUserActivity: (id) => req('GET', `/users/${id}/activity`),

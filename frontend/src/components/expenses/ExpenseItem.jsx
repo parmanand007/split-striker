@@ -13,10 +13,10 @@ const CATEGORY_META = {
   'Shopping':        { icon: ShoppingBag,     color: 'bg-rose-100 text-rose-600' },
   'Entertainment':   { icon: Film,            color: 'bg-pink-100 text-pink-600' },
   'Utilities':       { icon: Zap,             color: 'bg-yellow-100 text-yellow-600' },
-  'Other':           { icon: Package,         color: 'bg-slate-100 text-slate-500' },
+  'Other':           { icon: Package,         color: 'bg-slate-100 text-slate-500 dark:text-slate-400' },
 }
 
-function DEFAULT_ICON() { return { icon: Package, color: 'bg-slate-100 text-slate-500' } }
+function DEFAULT_ICON() { return { icon: Package, color: 'bg-slate-100 text-slate-500 dark:text-slate-400' } }
 
 export default function ExpenseItem({ expense, members, group, onEdit, onDeleted, onRequestEdit }) {
   const { currentUser } = useCurrentUser()
@@ -60,7 +60,7 @@ export default function ExpenseItem({ expense, members, group, onEdit, onDeleted
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <h3 className="font-semibold text-slate-800 text-sm leading-tight">{expense.description}</h3>
+                  <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-tight">{expense.description}</h3>
                   {expense.is_negative && (
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-md">REFUND</span>
                   )}
@@ -76,7 +76,7 @@ export default function ExpenseItem({ expense, members, group, onEdit, onDeleted
                 </p>
               </div>
               <div className="text-right flex-none">
-                <div className="font-bold text-slate-800 text-sm">
+                <div className="font-bold text-slate-800 dark:text-slate-100 text-sm">
                   {expense.original_currency} {parseFloat(expense.original_amount).toFixed(2)}
                 </div>
                 {expense.original_currency !== (group?.currency || 'INR') && expense.fx_rate !== '1' && (
@@ -86,7 +86,7 @@ export default function ExpenseItem({ expense, members, group, onEdit, onDeleted
             </div>
 
             {/* Who paid */}
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
               {isMultiPayer
                 ? `${payers.map(([uid, amt]) => `${memberMap[uid] || uid} (${parseFloat(amt).toFixed(2)})`).join(', ')}`
                 : `Paid by ${memberMap[payers[0]?.[0]] || '?'}`
@@ -151,7 +151,7 @@ export default function ExpenseItem({ expense, members, group, onEdit, onDeleted
           )}
           <button
             onClick={() => setShowDetail(v => !v)}
-            className="ml-auto flex items-center gap-1 text-xs text-slate-300 hover:text-slate-500 px-2 py-1 rounded-lg transition-colors"
+            className="ml-auto flex items-center gap-1 text-xs text-slate-300 hover:text-slate-500 dark:text-slate-400 px-2 py-1 rounded-lg transition-colors"
           >
             {showDetail ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
             {showDetail ? 'Less' : 'Details'}
@@ -162,15 +162,15 @@ export default function ExpenseItem({ expense, members, group, onEdit, onDeleted
       {/* Expanded detail */}
       {showDetail && (
         <div className="px-4 pb-4 border-t border-slate-50 pt-3">
-          <div className="text-xs text-slate-500 space-y-1">
-            <p className="font-semibold text-slate-600 mb-2">Split breakdown</p>
+          <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1">
+            <p className="font-semibold text-slate-600 dark:text-slate-300 mb-2">Split breakdown</p>
             {Object.entries(expense.split_amounts).map(([uid, amt]) => {
               const paid = parseFloat(expense.paid_by[uid] || 0)
               const owed = parseFloat(amt)
               const net = paid - owed
               return (
                 <div key={uid} className="flex items-center justify-between">
-                  <span className={uid === String(currentUser.id) ? 'font-semibold text-slate-700' : ''}>
+                  <span className={uid === String(currentUser.id) ? 'font-semibold text-slate-700 dark:text-slate-200' : ''}>
                     {memberMap[uid] || `User ${uid}`}{uid === String(currentUser.id) ? ' (you)' : ''}
                   </span>
                   <span className={`font-medium ${

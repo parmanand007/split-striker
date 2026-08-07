@@ -8,7 +8,7 @@ export function CurrentUserProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const stored = localStorage.getItem('splitease_user')
+    const stored = localStorage.getItem('split_striker_user')
     if (stored) {
       try {
         const parsed = JSON.parse(stored)
@@ -18,11 +18,11 @@ export function CurrentUserProvider({ children }) {
             setCurrentUser(u)
           })
           .catch(() => {
-            localStorage.removeItem('splitease_user')
+            localStorage.removeItem('split_striker_user')
           })
           .finally(() => setLoading(false))
       } catch {
-        localStorage.removeItem('splitease_user')
+        localStorage.removeItem('split_striker_user')
         setLoading(false)
       }
     } else {
@@ -32,12 +32,12 @@ export function CurrentUserProvider({ children }) {
 
   function login(user) {
     setCurrentUser(user)
-    localStorage.setItem('splitease_user', JSON.stringify(user))
+    localStorage.setItem('split_striker_user', JSON.stringify(user))
   }
 
   function logout() {
     setCurrentUser(null)
-    localStorage.removeItem('splitease_user')
+    localStorage.removeItem('split_striker_user')
   }
 
   return (

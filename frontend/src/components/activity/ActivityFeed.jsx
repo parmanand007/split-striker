@@ -6,7 +6,7 @@ const ACTION_META = {
   delete:         { label: 'deleted',              icon: Trash2,     color: 'bg-negative-100 text-negative-600' },
   payment:        { label: 'recorded a payment',   icon: CreditCard, color: 'bg-amber-100 text-amber-600' },
   member_add:     { label: 'joined the group',     icon: UserPlus,   color: 'bg-teal-100 text-teal-600' },
-  member_remove:  { label: 'left the group',       icon: UserMinus,  color: 'bg-slate-100 text-slate-500' },
+  member_remove:  { label: 'left the group',       icon: UserMinus,  color: 'bg-slate-100 text-slate-500 dark:text-slate-400' },
   edit_request:   { label: 'requested an edit',    icon: FilePen,    color: 'bg-violet-100 text-violet-600' },
   invite:         { label: 'created an invite',    icon: Users,      color: 'bg-sky-100 text-sky-600' },
 }
@@ -48,7 +48,7 @@ export default function ActivityFeed({ logs }) {
   return (
     <div className="space-y-4">
       {logs.map((log) => {
-        const meta = ACTION_META[log.action_type] || { icon: Receipt, color: 'bg-slate-100 text-slate-500' }
+        const meta = ACTION_META[log.action_type] || { icon: Receipt, color: 'bg-slate-100 text-slate-500 dark:text-slate-400' }
         const Icon = meta.icon
         const { actor, verb, subject } = activityText(log)
         const details = log.details || {}
@@ -59,10 +59,10 @@ export default function ActivityFeed({ logs }) {
               <Icon size={14} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-slate-700 leading-snug">
-                <span className="font-semibold text-slate-800">{actor}</span>
-                {' '}<span className="text-slate-500">{verb}</span>
-                {subject && <> <span className="font-medium text-slate-700">{subject}</span></>}
+              <p className="text-sm text-slate-700 dark:text-slate-200 leading-snug">
+                <span className="font-semibold text-slate-800 dark:text-slate-100">{actor}</span>
+                {' '}<span className="text-slate-500 dark:text-slate-400">{verb}</span>
+                {subject && <> <span className="font-medium text-slate-700 dark:text-slate-200">{subject}</span></>}
               </p>
               {details.amount && log.action_type !== 'payment' && (
                 <p className="text-xs text-slate-400 mt-0.5">

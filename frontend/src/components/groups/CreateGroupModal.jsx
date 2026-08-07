@@ -52,7 +52,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
     <Modal title="Create Group" onClose={onClose}>
       <form onSubmit={submit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Group name</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Group name</label>
           <input
             autoFocus
             value={name}
@@ -62,7 +62,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Default currency</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Default currency</label>
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
@@ -72,10 +72,10 @@ export default function CreateGroupModal({ onClose, onCreated }) {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Members</label>
-          <div className="max-h-40 overflow-y-auto space-y-1 border border-slate-200 rounded-lg p-2">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Members</label>
+          <div className="max-h-40 overflow-y-auto space-y-1 border border-slate-200 dark:border-slate-600 rounded-lg p-2">
             {allUsers.map((u) => (
-              <label key={u.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 rounded px-2 py-1">
+              <label key={u.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:hover:bg-slate-700/50 rounded px-2 py-1">
                 <input
                   type="checkbox"
                   checked={selectedIds.has(u.id)}
@@ -90,7 +90,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
         </div>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-slate-100">
             Cancel
           </button>
           <button

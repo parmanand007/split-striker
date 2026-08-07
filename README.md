@@ -1,4 +1,4 @@
-# SplitEase
+# Split Striker
 
 A full-featured expense-splitting app — Splitwise mechanics rebuilt from scratch with careful attention to the edge cases that make real money-splitting apps hard.
 

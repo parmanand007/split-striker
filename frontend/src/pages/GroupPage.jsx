@@ -58,11 +58,11 @@ function RequestEditModal({ expense, group, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-3xl shadow-modal w-full max-w-md p-6 animate-slide-up">
+      <div className="relative bg-white dark:bg-slate-800 rounded-3xl shadow-modal w-full max-w-md p-6 animate-slide-up">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <FilePen size={18} className="text-violet-600" />
-            <h2 className="text-base font-bold text-slate-800">Request edit</h2>
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Request edit</h2>
           </div>
           <button onClick={onClose} className="btn-ghost p-1.5"><X size={16} /></button>
         </div>
@@ -72,21 +72,21 @@ function RequestEditModal({ expense, group, onClose }) {
             <div className="w-12 h-12 rounded-2xl bg-positive-100 flex items-center justify-center mx-auto mb-3">
               <FilePen size={22} className="text-positive-600" />
             </div>
-            <p className="font-semibold text-slate-800">Request sent!</p>
+            <p className="font-semibold text-slate-800 dark:text-slate-100">Request sent!</p>
             <p className="text-sm text-slate-400 mt-1">The group owner will review your request.</p>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-4">
-            <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500">
-              Editing: <span className="font-semibold text-slate-700">"{expense.description}"</span>
+            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 text-xs text-slate-500 dark:text-slate-400">
+              Editing: <span className="font-semibold text-slate-700 dark:text-slate-200">"{expense.description}"</span>
               <br />Your changes will be sent to the group owner for approval.
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Description</label>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Description</label>
               <input value={description} onChange={e => setDescription(e.target.value)} className="input" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Category</label>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Category</label>
               <select value={category} onChange={e => setCategory(e.target.value)} className="input">
                 <option value="">— none —</option>
                 {['Food & Drink','Accommodation','Transport','Shopping','Entertainment','Utilities','Other'].map(c => (
@@ -95,11 +95,11 @@ function RequestEditModal({ expense, group, onClose }) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Notes</label>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Notes</label>
               <input value={notes} onChange={e => setNotes(e.target.value)} className="input" placeholder="Add context…" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5">Message to owner <span className="font-normal text-slate-400">(optional)</span></label>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Message to owner <span className="font-normal text-slate-400">(optional)</span></label>
               <input value={message} onChange={e => setMessage(e.target.value)} className="input" placeholder="Why are you requesting this change?" />
             </div>
             {error && <p className="text-negative-600 text-xs bg-negative-50 px-3 py-2 rounded-lg">{error}</p>}
@@ -163,7 +163,7 @@ export default function GroupPage() {
         <div>
           <div className="flex items-center gap-2 mb-0.5">
             {group.emoji && <span className="text-2xl">{group.emoji}</span>}
-            <h1 className="text-2xl font-bold text-slate-800">{group.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{group.name}</h1>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-400">
             <span>{group.currency}</span>
@@ -230,7 +230,7 @@ export default function GroupPage() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${
                 m.id === currentUser.id
                   ? 'bg-brand-50 border-brand-200 text-brand-700'
-                  : 'bg-white border-slate-200 text-slate-600'
+                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
               }`}
             >
               <span>{m.name}</span>
@@ -246,7 +246,7 @@ export default function GroupPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 dark:border-slate-600">
         {TABS.map(t => (
           <button
             key={t}
@@ -254,12 +254,12 @@ export default function GroupPage() {
             className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
               tab === t
                 ? 'border-brand-600 text-brand-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'
             }`}
           >
             {t}
             {t === 'Expenses' && expenses.length > 0 && (
-              <span className="ml-1.5 text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full">
+              <span className="ml-1.5 text-xs bg-slate-100 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded-full">
                 {expenses.length}
               </span>
             )}
@@ -271,9 +271,9 @@ export default function GroupPage() {
       {tab === 'Expenses' && (
         <div className="space-y-3">
           {expenses.length === 0 ? (
-            <div className="card border-dashed border-2 border-slate-200 p-12 text-center">
+            <div className="card border-dashed border-2 border-slate-200 dark:border-slate-600 p-12 text-center">
               <div className="text-4xl mb-3">💸</div>
-              <p className="text-sm font-semibold text-slate-600">No expenses yet</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No expenses yet</p>
               {!group.archived && isMember && (
                 <button onClick={() => setShowAdd(true)} className="btn-primary mt-4 text-sm">
                   Add the first expense
@@ -305,8 +305,8 @@ export default function GroupPage() {
             balances?.balances.map(b => {
               const val = parseFloat(b.balance)
               return (
-                <div key={b.user_id} className={`flex items-center justify-between p-3 rounded-xl ${b.user_id === currentUser.id ? 'bg-slate-50' : ''}`}>
-                  <span className="text-sm font-medium text-slate-700">
+                <div key={b.user_id} className={`flex items-center justify-between p-3 rounded-xl ${b.user_id === currentUser.id ? 'bg-slate-50 dark:bg-slate-800/50' : ''}`}>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                     {b.user_name}
                     {b.user_id === currentUser.id && <span className="ml-1 text-xs text-slate-400">(you)</span>}
                   </span>

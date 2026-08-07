@@ -18,7 +18,10 @@ class DecimalModel(BaseModel):
 
 class UserCreate(BaseModel):
     name: str
-    email: Optional[str] = None
+    email: str
+
+class LoginByEmail(BaseModel):
+    email: str
 
 
 class UserOut(BaseModel):
