@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Loader2, User, Mail, ChevronLeft, CheckCircle2, Zap } from 'lucide-react'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 
 export default function UserSelectPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get('next') || searchParams.get('redirect') || '/'
   const { login, currentUser } = useCurrentUser()
   const [step, setStep] = useState('email') // 'email' | 'signup'
   const [email, setEmail] = useState('')
@@ -17,7 +19,7 @@ export default function UserSelectPage() {
   const emailRef = useRef()
   const nameRef = useRef()
 
-  useEffect(() => { if (currentUser) navigate('/') }, [currentUser])
+  useEffect(() => { if (currentUser) navigate(decodeURIComponent(redirectTo), { replace: true }) }, [currentUser])
   useEffect(() => { if (step === 'email') emailRef.current?.focus() }, [step])
   useEffect(() => { if (step === 'signup') setTimeout(() => nameRef.current?.focus(), 120) }, [step])
 
@@ -38,7 +40,7 @@ export default function UserSelectPage() {
       setSuccess(true)
       await new Promise(r => setTimeout(r, 500))
       login(user)
-      navigate('/')
+      navigate(decodeURIComponent(redirectTo), { replace: true })
     } catch (err) {
       if (err.message?.includes('No account')) {
         setStep('signup')
@@ -60,7 +62,7 @@ export default function UserSelectPage() {
       setSuccess(true)
       await new Promise(r => setTimeout(r, 500))
       login(user)
-      navigate('/')
+      navigate(decodeURIComponent(redirectTo), { replace: true })
     } catch (err) {
       if (err.message?.toLowerCase().includes('email')) setEmailError(err.message)
       else setNameError(err.message)

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { CurrentUserProvider, useCurrentUser } from './hooks/useCurrentUser'
 import UserSelectPage from './pages/UserSelectPage'
 import HomePage from './pages/HomePage'
@@ -10,6 +10,7 @@ import Layout from './components/layout/Layout'
 
 function ProtectedRoutes() {
   const { currentUser, loading } = useCurrentUser()
+  const location = useLocation()
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -17,7 +18,10 @@ function ProtectedRoutes() {
       </div>
     )
   }
-  if (!currentUser) return <Navigate to="/login" replace />
+  if (!currentUser) {
+    const next = encodeURIComponent(location.pathname + location.search)
+    return <Navigate to={`/login?next=${next}`} replace />
+  }
   return (
     <Layout>
       <Routes>

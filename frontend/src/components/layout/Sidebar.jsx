@@ -49,7 +49,7 @@ function groupColor(id) {
   return GROUP_COLORS[id % GROUP_COLORS.length]
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }) {
   const { currentUser, logout } = useCurrentUser()
   const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
@@ -91,7 +91,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className="w-64 flex-none flex flex-col h-screen transition-colors duration-300 border-r border-white/5"
+        className="w-72 md:w-64 flex-none flex flex-col h-screen transition-colors duration-300 border-r border-white/5"
         style={{ background: 'var(--sidebar-bg)' }}
       >
         {/* Logo */}
@@ -108,6 +108,7 @@ export default function Sidebar() {
         <nav className="px-3 space-y-0.5">
           <Link
             to="/"
+            onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
               location.pathname === '/'
                 ? 'bg-white/10 text-white shadow-sm'
@@ -119,6 +120,7 @@ export default function Sidebar() {
           </Link>
           <Link
             to="/dev/test-suite"
+            onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
               location.pathname === '/dev/test-suite'
                 ? 'bg-white/10 text-white shadow-sm'
@@ -168,6 +170,7 @@ export default function Sidebar() {
                 <Link
                   key={g.id}
                   to={`/groups/${g.id}`}
+                  onClick={onClose}
                   className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all ${
                     active
                       ? 'bg-white/10 text-white shadow-sm'

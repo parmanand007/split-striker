@@ -23,7 +23,7 @@ export default function InvitePage() {
 
   async function handleJoin() {
     if (!currentUser) {
-      navigate(`/login?redirect=/invite/${token}`)
+      navigate(`/login?next=${encodeURIComponent(`/invite/${token}`)}`)
       return
     }
     setJoining(true)
