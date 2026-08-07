@@ -6,6 +6,7 @@ import GroupPage from './pages/GroupPage'
 import GroupSettingsPage from './pages/GroupSettingsPage'
 import TestSuitePage from './pages/TestSuitePage'
 import InvitePage from './pages/InvitePage'
+import NotFoundPage from './pages/NotFoundPage'
 import Layout from './components/layout/Layout'
 
 function ProtectedRoutes() {
@@ -29,6 +30,7 @@ function ProtectedRoutes() {
         <Route path="/groups/:id" element={<GroupPage />} />
         <Route path="/groups/:id/settings" element={<GroupSettingsPage />} />
         <Route path="/dev/test-suite" element={<TestSuitePage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Layout>
   )
@@ -40,6 +42,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<UserSelectPage />} />
         <Route path="/invite/:token" element={<InvitePage />} />
+        <Route path="/404" element={<NotFoundPage />} />
         <Route path="/*" element={<ProtectedRoutes />} />
       </Routes>
     </CurrentUserProvider>
