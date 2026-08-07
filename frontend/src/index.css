@@ -22,14 +22,14 @@
   --brand-900: 108 18  34;
   --brand-950: 64  5   17;
 
-  --sidebar-bg:  #160508;
-  --page-bg:     #1e080c;
-  --card-bg:     #2d0e14;
-  --card-border: #4a1820;
+  --sidebar-bg:  #3a0810;
+  --page-bg:     #4d0d17;
+  --card-bg:     #5e1422;
+  --card-border: #7a2035;
   --blob-a: 220 38  60;
-  --blob-b: 185 20  42;
-  --blob-c: 234 88  12;
-  --login-bg: linear-gradient(145deg, #1a0508 0%, #280b10 50%, #0e0205 100%);
+  --blob-b: 251 146 60;
+  --blob-c: 245 158 11;
+  --login-bg: linear-gradient(145deg, #3a0a12 0%, #520e1a 50%, #28060a 100%);
 }
 
 /* ── 2. FOREST (deep forest green) ── */
@@ -46,14 +46,14 @@
   --brand-900: 20  83  45;
   --brand-950: 5   46  22;
 
-  --sidebar-bg:  #051408;
-  --page-bg:     #081e0d;
-  --card-bg:     #0f2e18;
-  --card-border: #1a4a28;
+  --sidebar-bg:  #0a2e12;
+  --page-bg:     #0d3d18;
+  --card-bg:     #124e20;
+  --card-border: #1c6830;
   --blob-a: 34  197 94;
-  --blob-b: 16  185 129;
-  --blob-c: 132 204 22;
-  --login-bg: linear-gradient(145deg, #06150a 0%, #0a2010 50%, #030a05 100%);
+  --blob-b: 132 204 22;
+  --blob-c: 16  185 129;
+  --login-bg: linear-gradient(145deg, #0a3015 0%, #104020 50%, #062010 100%);
 }
 
 /* ── 3. AMBER (warm gold / honey) ── */
@@ -70,17 +70,17 @@
   --brand-900: 120 53  15;
   --brand-950: 69  26  3;
 
-  --sidebar-bg:  #160f02;
-  --page-bg:     #1e1503;
-  --card-bg:     #2e2005;
-  --card-border: #48340a;
+  --sidebar-bg:  #3d2505;
+  --page-bg:     #503008;
+  --card-bg:     #63400c;
+  --card-border: #7d5518;
   --blob-a: 245 158 11;
   --blob-b: 251 191 36;
-  --blob-c: 249 115 22;
-  --login-bg: linear-gradient(145deg, #1a1002 0%, #251802 50%, #0e0a01 100%);
+  --blob-c: 234 88  12;
+  --login-bg: linear-gradient(145deg, #3d2508 0%, #503010 50%, #281805 100%);
 }
 
-/* ── 4. OLIVE (earthy olive / khaki) ── */
+/* ── 4. OLIVE (earthy olive / sage) ── */
 [data-theme="olive"] {
   --brand-50:  247 254 231;
   --brand-100: 236 252 203;
@@ -94,17 +94,17 @@
   --brand-900: 54  83  19;
   --brand-950: 26  46  5;
 
-  --sidebar-bg:  #0e1205;
-  --page-bg:     #141a07;
-  --card-bg:     #1e280c;
-  --card-border: #2e3e14;
+  --sidebar-bg:  #222c05;
+  --page-bg:     #2c3808;
+  --card-bg:     #38490e;
+  --card-border: #4a5e18;
   --blob-a: 132 204 22;
   --blob-b: 34  197 94;
   --blob-c: 245 158 11;
-  --login-bg: linear-gradient(145deg, #0f1306 0%, #171d08 50%, #080a03 100%);
+  --login-bg: linear-gradient(145deg, #222c08 0%, #2c3a0a 50%, #161e04 100%);
 }
 
-/* ── 5. TEAL (rich jade / teal) ── */
+/* ── 5. TEAL (rich jade / deep teal) ── */
 [data-theme="teal"] {
   --brand-50:  240 253 250;
   --brand-100: 204 251 241;
@@ -118,17 +118,17 @@
   --brand-900: 19  78  74;
   --brand-950: 4   47  46;
 
-  --sidebar-bg:  #031614;
-  --page-bg:     #051e1c;
-  --card-bg:     #0a2e2c;
-  --card-border: #124644;
+  --sidebar-bg:  #063025;
+  --page-bg:     #0a4035;
+  --card-bg:     #0e5244;
+  --card-border: #166858;
   --blob-a: 20  184 166;
   --blob-b: 34  197 94;
   --blob-c: 132 204 22;
-  --login-bg: linear-gradient(145deg, #041614 0%, #071e1c 50%, #020c0b 100%);
+  --login-bg: linear-gradient(145deg, #063028 0%, #0a4038 50%, #042820 100%);
 }
 
-/* ── 6. RUST (terracotta / burnt orange) ── */
+/* ── 6. RUST (terracotta / burnt sienna) ── */
 [data-theme="rust"] {
   --brand-50:  255 247 237;
   --brand-100: 255 231 204;
@@ -142,14 +142,14 @@
   --brand-900: 100 38  16;
   --brand-950: 55  17  5;
 
-  --sidebar-bg:  #180a02;
-  --page-bg:     #221005;
-  --card-bg:     #341808;
-  --card-border: #4e260e;
+  --sidebar-bg:  #3d1a06;
+  --page-bg:     #502310;
+  --card-bg:     #622e16;
+  --card-border: #7e3f22;
   --blob-a: 234 88  12;
   --blob-b: 220 38  60;
   --blob-c: 245 158 11;
-  --login-bg: linear-gradient(145deg, #1c0a02 0%, #2a1205 50%, #0e0501 100%);
+  --login-bg: linear-gradient(145deg, #3d1a08 0%, #502512 50%, #281205 100%);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -160,11 +160,23 @@
   html {
     font-feature-settings: "cv02","cv03","cv04","cv11";
     transition: background-color 0.3s ease, color 0.3s ease;
+    color-scheme: dark;
   }
   body {
     background: var(--page-bg);
     @apply text-slate-100 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
+  }
+  /* Force dark styling on all inputs — prevents white autofill from browser */
+  input, select, textarea {
+    color-scheme: dark;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgba(0,0,0,0.5) inset !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    caret-color: #f1f5f9;
   }
   ::selection { @apply bg-brand-600 text-white; }
   ::-webkit-scrollbar { width: 4px; height: 4px; }

@@ -122,9 +122,10 @@ export default function UserSelectPage() {
                     onChange={e => { setEmail(e.target.value); setEmailError('') }}
                     placeholder="you@gmail.com"
                     autoComplete="email"
-                    className={`w-full bg-white/8 border rounded-2xl pl-10 pr-4 py-3.5 text-sm text-white placeholder:text-slate-600
+                    style={{ background: 'rgba(0,0,0,0.35)', colorScheme: 'dark' }}
+                    className={`w-full border rounded-2xl pl-10 pr-4 py-3.5 text-sm text-white placeholder:text-slate-500
                       focus:outline-none focus:ring-2 focus:border-brand-400 transition-all duration-200
-                      ${emailError ? 'border-negative-500/70 focus:ring-negative-500/25' : 'border-white/12 focus:ring-brand-500/30'}`}
+                      ${emailError ? 'border-negative-500/70 focus:ring-negative-500/25' : 'border-white/15 focus:ring-brand-500/30'}`}
                   />
                 </div>
 
@@ -190,7 +191,8 @@ export default function UserSelectPage() {
                     type="email"
                     value={email}
                     readOnly
-                    className="w-full bg-white/4 border border-white/8 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-400 cursor-default"
+                    style={{ background: 'rgba(0,0,0,0.25)', colorScheme: 'dark' }}
+                    className="w-full border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-slate-400 cursor-default"
                   />
                 </div>
 
@@ -203,9 +205,10 @@ export default function UserSelectPage() {
                     onChange={e => { setName(e.target.value); setNameError('') }}
                     placeholder="Your full name"
                     autoComplete="name"
-                    className={`w-full bg-white/8 border rounded-2xl pl-10 pr-4 py-3.5 text-sm text-white placeholder:text-slate-600
+                    style={{ background: 'rgba(0,0,0,0.35)', colorScheme: 'dark' }}
+                    className={`w-full border rounded-2xl pl-10 pr-4 py-3.5 text-sm text-white placeholder:text-slate-500
                       focus:outline-none focus:ring-2 focus:border-brand-400 transition-all duration-200
-                      ${nameError ? 'border-negative-500/70 focus:ring-negative-500/25' : 'border-white/12 focus:ring-brand-500/30'}`}
+                      ${nameError ? 'border-negative-500/70 focus:ring-negative-500/25' : 'border-white/15 focus:ring-brand-500/30'}`}
                   />
                 </div>
 
