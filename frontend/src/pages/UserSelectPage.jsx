@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, Loader2, User, Mail, Lock, Eye, EyeOff, Zap } from 'lucide-react'
+import { ArrowRight, Loader2, User, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
+import Logo from '../components/Logo'
 
 export default function UserSelectPage() {
   const navigate = useNavigate()
@@ -92,14 +93,9 @@ export default function UserSelectPage() {
 
       <div className="relative w-full max-w-sm animate-pop-scale">
         {/* Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-800 flex items-center justify-center shadow-2xl shadow-brand-500/40 animate-glow-pulse">
-              <Zap size={22} className="text-white" />
-            </div>
-            <span className="text-2xl font-black text-white tracking-tight">Split Striker</span>
-          </div>
-          <p className="text-slate-400 text-sm">Split expenses. Stay friends.</p>
+        <div className="flex flex-col items-center mb-8">
+          <Logo size="lg" />
+          <p className="text-slate-400 text-sm mt-3">Split expenses. Stay friends.</p>
         </div>
 
         <div className="bg-white/[0.07] backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">

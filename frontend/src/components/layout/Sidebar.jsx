@@ -8,6 +8,7 @@ import { useCurrentUser } from '../../hooks/useCurrentUser'
 import { useTheme, THEMES } from '../../hooks/useTheme'
 import { api } from '../../api/client'
 import CreateGroupModal from '../groups/CreateGroupModal'
+import Logo from '../Logo'
 
 function ThemeSwitcher({ theme, setTheme }) {
   return (
@@ -96,12 +97,7 @@ export default function Sidebar({ onClose }) {
       >
         {/* Logo */}
         <div className="px-5 pt-6 pb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/30 transition-all duration-300">
-              <span className="text-white font-black text-sm">S</span>
-            </div>
-            <span className="text-white font-bold text-lg tracking-tight">Split Striker</span>
-          </div>
+          <Logo size="sm" />
         </div>
 
         {/* Nav */}

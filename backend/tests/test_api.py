@@ -231,6 +231,18 @@ class TestAuth:
         r = client.post("/api/auth/login", json={"email": "nopass@t.com", "password": "anything"})
         assert r.status_code == 401
 
+    def test_signup_sets_password_for_passwordless_account(self, client):
+        # Simulate old account with no password
+        mk_user(client, "OldUser", "old@t.com")
+        # Signup with same email should set password (not reject)
+        r = client.post("/api/auth/signup", json={"name": "OldUser", "email": "old@t.com", "password": "newpass"})
+        assert r.status_code == 201
+        d = r.json()
+        assert "token" in d
+        # Can now log in
+        r2 = client.post("/api/auth/login", json={"email": "old@t.com", "password": "newpass"})
+        assert r2.status_code == 200
+
 
 # ════════════════════════════════════════════════════════════════════════════
 # GROUPS
