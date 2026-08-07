@@ -18,16 +18,7 @@ beforeEach(() => {
 })
 
 describe('API client', () => {
-  it('getGroups hits /groups with user_id query', async () => {
-    mockFetch.mockResolvedValueOnce(mockResponse([]))
-    await api.getGroups(42)
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('user_id=42'),
-      expect.any(Object)
-    )
-  })
-
-  it('getGroups without userId hits /groups', async () => {
+  it('getGroups hits /groups (JWT scoped)', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse([]))
     await api.getGroups()
     expect(mockFetch).toHaveBeenCalledWith(

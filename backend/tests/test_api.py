@@ -13,6 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from database import Base, get_db
+from dependencies import get_current_user
 from main import app
 
 SQLALCHEMY_TEST_URL = "sqlite:///:memory:"
@@ -40,6 +41,7 @@ def client():
         finally:
             db.close()
     app.dependency_overrides[get_db] = override_db
+    app.dependency_overrides[get_current_user] = lambda: None  # bypass JWT in tests
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()

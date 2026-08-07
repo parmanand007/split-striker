@@ -6,11 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from database import get_db
+from dependencies import get_current_user
 from models import Expense, Group, User, ActivityLog, ActionType, EntityType, SplitType
 from schemas import ExpenseCreate, ExpenseUpdate, ExpenseOut, DuplicateWarning, FriendExpenseCreate
 from services.split_calculator import calculate_split, quantum
 
-router = APIRouter(tags=["expenses"])
+router = APIRouter(tags=["expenses"], dependencies=[Depends(get_current_user)])
 
 
 def _get_group(group_id: int, db: Session) -> Group:

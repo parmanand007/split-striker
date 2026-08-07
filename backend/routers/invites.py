@@ -6,9 +6,10 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from database import get_db
+from dependencies import get_current_user
 from models import Group, GroupInvite, User, ActivityLog, ActionType, EntityType
 
-router = APIRouter(prefix="/api/invite", tags=["invites"])
+router = APIRouter(prefix="/api/invite", tags=["invites"], dependencies=[Depends(get_current_user)])
 
 
 class InviteOut(BaseModel):

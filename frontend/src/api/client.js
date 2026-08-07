@@ -37,7 +37,7 @@ export const api = {
   getUserActivity: (id) => req('GET', `/users/${id}/activity`),
 
   // Groups
-  getGroups: (userId) => req('GET', `/groups${userId ? `?user_id=${userId}` : ''}`),
+  getGroups: () => req('GET', '/groups'),
   createGroup: (data) => req('POST', '/groups', data),
   getGroup: (id) => req('GET', `/groups/${id}`),
   updateGroup: (id, data) => req('PUT', `/groups/${id}`, data),

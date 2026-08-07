@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db
+from dependencies import get_current_user
 from models import Payment, Group, User, ActivityLog, ActionType, EntityType
 from schemas import PaymentCreate, PaymentOut
 
-router = APIRouter(tags=["payments"])
+router = APIRouter(tags=["payments"], dependencies=[Depends(get_current_user)])
 
 
 def _payment_out(p: Payment) -> PaymentOut:

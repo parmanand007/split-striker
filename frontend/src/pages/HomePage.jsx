@@ -53,7 +53,7 @@ export default function HomePage() {
     Promise.all([
       api.getUserSummary(currentUser.id),
       api.getUserActivity(currentUser.id),
-      api.getGroups(currentUser.id),
+      api.getGroups(),
     ]).then(([s, a, g]) => {
       setSummary(s)
       setActivity(a)

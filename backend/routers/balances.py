@@ -5,12 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db
+from dependencies import get_current_user
 from models import Group, User
 from schemas import GroupBalances, UserBalance, SettlementPlan, SettlementItem
 from services.balance_calculator import compute_net_balances, compute_pairwise_balances
 from services.debt_simplifier import simplify_debts
 
-router = APIRouter(tags=["balances"])
+router = APIRouter(tags=["balances"], dependencies=[Depends(get_current_user)])
 
 
 def _get_group(group_id: int, db: Session) -> Group:

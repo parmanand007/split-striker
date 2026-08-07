@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from database import get_db
+from dependencies import get_current_user
 from models import ActivityLog, Group, User
 from schemas import ActivityLogOut
 
-router = APIRouter(tags=["activity"])
+router = APIRouter(tags=["activity"], dependencies=[Depends(get_current_user)])
 
 
 def _log_out(log: ActivityLog) -> ActivityLogOut:

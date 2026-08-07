@@ -61,7 +61,7 @@ export default function Sidebar({ onClose }) {
 
   useEffect(() => {
     if (!currentUser) return
-    api.getGroups(currentUser.id).then(setGroups).catch(console.error)
+    api.getGroups().then(setGroups).catch(console.error)
     api.getUserSummary(currentUser.id).then(setSummary).catch(console.error)
   }, [currentUser, location.pathname])
 

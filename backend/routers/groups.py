@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db
+from dependencies import get_current_user
 from models import Group, User, Expense, Payment, ActivityLog, ActionType, EntityType
 from schemas import GroupCreate, GroupOut, GroupUpdate, AddMemberRequest
 
-router = APIRouter(prefix="/api/groups", tags=["groups"])
+router = APIRouter(prefix="/api/groups", tags=["groups"], dependencies=[Depends(get_current_user)])
 
 
 def _get_group(group_id: int, db: Session) -> Group:
@@ -48,11 +49,22 @@ def create_group(body: GroupCreate, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=List[GroupOut])
-def list_groups(user_id: int = None, db: Session = Depends(get_db)):
-    q = db.query(Group)
-    if user_id:
-        q = q.filter(Group.members.any(User.id == user_id))
-    return q.order_by(Group.created_at.desc()).all()
+def list_groups(
+    user_id: int = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # In production: always scope to the JWT user (ignore user_id param).
+    # In tests: current_user is None (bypassed), so user_id param is the fallback.
+    filter_id = current_user.id if current_user is not None else user_id
+    if not filter_id:
+        return []
+    return (
+        db.query(Group)
+        .filter(Group.members.any(User.id == filter_id))
+        .order_by(Group.created_at.desc())
+        .all()
+    )
 
 
 @router.get("/{group_id}", response_model=GroupOut)

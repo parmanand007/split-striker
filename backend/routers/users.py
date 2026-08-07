@@ -7,11 +7,12 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from database import get_db
+from dependencies import get_current_user
 from models import User, Group, Expense, Payment
 from schemas import UserCreate, UserOut, UserSummary, LoginByEmail
 from services.balance_calculator import compute_net_balances
 
-router = APIRouter(prefix="/api/users", tags=["users"])
+router = APIRouter(prefix="/api/users", tags=["users"], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/login", response_model=UserOut)

@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from database import get_db
+from dependencies import get_current_user
 from models import (
     EditRequest, EditRequestStatus, Expense, Group, User,
     ActivityLog, ActionType, EntityType,
 )
 
-router = APIRouter(prefix="/api", tags=["edit-requests"])
+router = APIRouter(prefix="/api", tags=["edit-requests"], dependencies=[Depends(get_current_user)])
 
 
 class EditRequestCreate(BaseModel):
