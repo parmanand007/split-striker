@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="pageBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080d14"/>
+      <stop offset="55%" stop-color="#0e1825"/>
+      <stop offset="100%" stop-color="#080d14"/>
+    </linearGradient>
+    <linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7f0e26"/>
+      <stop offset="55%" stop-color="#be1240"/>
+      <stop offset="100%" stop-color="#e63358"/>
+    </linearGradient>
+    <linearGradient id="iconGloss" x1="0%" y1="0%" x2="30%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <radialGradient id="blob1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#be1240" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#be1240" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blob2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3b6abf" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#3b6abf" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#pageBg)"/>
+
+  <!-- Colour blobs -->
+  <ellipse cx="980" cy="120" rx="380" ry="340" fill="url(#blob1)"/>
+  <ellipse cx="160" cy="520" rx="320" ry="280" fill="url(#blob2)"/>
+
+  <!-- Subtle dot grid -->
+  <pattern id="dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.04)"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- App icon -->
+  <rect x="90" y="200" width="130" height="130" rx="32" fill="url(#iconBg)" filter="url(#shadow)"/>
+  <rect x="90" y="200" width="130" height="130" rx="32" fill="url(#iconGloss)"/>
+  <!-- Lightning bolt -->
+  <path d="M168 218 L133 272 h27 l-9 40 L196 258 h-27 Z" fill="white" stroke="white" stroke-width="1" stroke-linejoin="round"/>
+
+  <!-- Brand name -->
+  <text x="242" y="269" font-family="'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="900" letter-spacing="-2" fill="white">Split Striker</text>
+
+  <!-- Tagline -->
+  <text x="242" y="312" font-family="'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="400" fill="rgba(255,255,255,0.55)">Split expenses. Stay friends.</text>
+
+  <!-- Divider -->
+  <line x1="90" y1="375" x2="1110" y2="375" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Feature pills -->
+  <g font-family="'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="500" fill="white">
+    <!-- Pill 1 -->
+    <rect x="90" y="400" width="200" height="44" rx="22" fill="rgba(190,18,64,0.25)" stroke="rgba(190,18,64,0.5)" stroke-width="1"/>
+    <text x="190" y="427" text-anchor="middle" fill="rgba(255,255,255,0.85)">⚡ Free forever</text>
+
+    <!-- Pill 2 -->
+    <rect x="308" y="400" width="220" height="44" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="418" y="427" text-anchor="middle" fill="rgba(255,255,255,0.85)">👥 Group expenses</text>
+
+    <!-- Pill 3 -->
+    <rect x="546" y="400" width="220" height="44" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="656" y="427" text-anchor="middle" fill="rgba(255,255,255,0.85)">💸 Settle debts</text>
+
+    <!-- Pill 4 -->
+    <rect x="784" y="400" width="220" height="44" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="894" y="427" text-anchor="middle" fill="rgba(255,255,255,0.85)">📱 Works on mobile</text>
+  </g>
+
+  <!-- URL badge -->
+  <text x="90" y="565" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" fill="rgba(255,255,255,0.30)">split-striker-1.onrender.com</text>
+</svg>

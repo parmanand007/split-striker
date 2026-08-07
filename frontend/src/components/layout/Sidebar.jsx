@@ -103,10 +103,10 @@ export default function Sidebar({ onClose }) {
         {/* Nav */}
         <nav className="px-3 space-y-0.5">
           <Link
-            to="/"
+            to="/groups"
             onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-              location.pathname === '/'
+              location.pathname === '/groups'
                 ? 'bg-white/10 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}

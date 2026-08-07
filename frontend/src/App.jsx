@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { CurrentUserProvider, useCurrentUser } from './hooks/useCurrentUser'
 import UserSelectPage from './pages/UserSelectPage'
+import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
 import GroupPage from './pages/GroupPage'
 import GroupSettingsPage from './pages/GroupSettingsPage'
@@ -26,7 +27,7 @@ function ProtectedRoutes() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/groups" element={<HomePage />} />
         <Route path="/groups/:id" element={<GroupPage />} />
         <Route path="/groups/:id/settings" element={<GroupSettingsPage />} />
         <Route path="/dev/test-suite" element={<TestSuitePage />} />
@@ -40,6 +41,7 @@ export default function App() {
   return (
     <CurrentUserProvider>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<UserSelectPage />} />
         <Route path="/invite/:token" element={<InvitePage />} />
         <Route path="/404" element={<NotFoundPage />} />

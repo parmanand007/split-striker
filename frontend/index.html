@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
 
     <!-- Anti-FOUC: apply saved theme before React renders -->
     <script>
@@ -15,70 +17,240 @@
       })();
     </script>
 
-    <!-- Primary Meta -->
+    <!-- ═══ PRIMARY META ══════════════════════════════════════════════════ -->
     <title>Split Striker — Split Expenses, Stay Friends</title>
-    <meta name="description" content="Split Striker makes splitting bills with friends and groups effortless. Track who owes what, settle up instantly, and keep your friendships intact. Free, fast, no sign-up hassle." />
-    <meta name="keywords" content="split expenses, expense tracker, bill splitting, group expenses, splitwise alternative, split bills, shared expenses, expense sharing app, money split, group trip expenses" />
+    <meta name="description" content="Split Striker is the free, fast expense-splitting app for friends, roommates, and travel groups. Track who owes what, settle debts in seconds, and keep your friendships intact. No credit card needed." />
+    <meta name="keywords" content="split expenses, expense tracker, bill splitting, group expenses, splitwise alternative, split bills, shared expenses, roommate expenses, travel expense tracker, group trip planner, money split, IOU tracker, settle debts, expense sharing app, free expense splitter" />
     <meta name="author" content="Split Striker" />
-    <meta name="theme-color" content="#dc2638" />
-    <meta name="robots" content="index, follow" />
-    <meta name="googlebot" content="index, follow" />
+    <meta name="application-name" content="Split Striker" />
+    <meta name="rating" content="general" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="language" content="English" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />
     <link rel="canonical" href="https://split-striker-1.onrender.com/" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- ═══ OPEN GRAPH ════════════════════════════════════════════════════ -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://split-striker-1.onrender.com/" />
     <meta property="og:title" content="Split Striker — Split Expenses, Stay Friends" />
-    <meta property="og:description" content="Track shared expenses, settle balances, and split bills fairly with friends and groups. Fast, simple, free. No credit card required." />
-    <meta property="og:image" content="https://split-striker-1.onrender.com/og-image.png" />
+    <meta property="og:description" content="Track shared expenses, settle balances, and split bills fairly with friends and groups. Free, fast, no credit card required." />
+    <meta property="og:image" content="https://split-striker-1.onrender.com/og-image.svg" />
+    <meta property="og:image:secure_url" content="https://split-striker-1.onrender.com/og-image.svg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Split Striker — Expense splitting made easy" />
+    <meta property="og:image:alt" content="Split Striker — Free expense splitting for friends and groups" />
     <meta property="og:site_name" content="Split Striker" />
     <meta property="og:locale" content="en_US" />
 
-    <!-- Twitter Card -->
+    <!-- ═══ TWITTER CARD ═════════════════════════════════════════════════ -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://split-striker-1.onrender.com/" />
     <meta name="twitter:title" content="Split Striker — Split Expenses, Stay Friends" />
-    <meta name="twitter:description" content="Track shared expenses, settle balances, and split bills fairly with friends and groups." />
-    <meta name="twitter:image" content="https://split-striker-1.onrender.com/og-image.png" />
-    <meta name="twitter:image:alt" content="Split Striker app preview" />
+    <meta name="twitter:description" content="Free expense-splitting app for friends, roommates & travel groups. Track who owes what and settle up in seconds." />
+    <meta name="twitter:image" content="https://split-striker-1.onrender.com/og-image.svg" />
+    <meta name="twitter:image:alt" content="Split Striker app — expense splitting made easy" />
 
-    <!-- PWA / App -->
-    <meta name="application-name" content="Split Striker" />
+    <!-- ═══ PWA / ICONS ══════════════════════════════════════════════════ -->
+    <meta name="theme-color" content="#be1240" />
+    <meta name="msapplication-TileColor" content="#be1240" />
+    <meta name="msapplication-TileImage" content="/favicon.svg" />
     <meta name="apple-mobile-web-app-title" content="Split Striker" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
 
-    <!-- Fonts -->
+    <!-- ═══ RESOURCE HINTS ═══════════════════════════════════════════════ -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://split-striker.onrender.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://split-striker.onrender.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <!-- Structured Data -->
+    <!-- ═══ STRUCTURED DATA ══════════════════════════════════════════════ -->
+
+    <!-- SoftwareApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@type": "SoftwareApplication",
       "name": "Split Striker",
+      "alternateName": ["SplitStriker", "Split Striker App", "Expense Splitter"],
       "url": "https://split-striker-1.onrender.com",
-      "description": "Split expenses with friends and groups. Track who owes what and settle up easily. Free expense splitting app.",
+      "description": "Split Striker is a free web application for splitting expenses with friends, roommates, and travel groups. Track who owes what, settle debts, and manage shared bills effortlessly.",
       "applicationCategory": "FinanceApplication",
+      "applicationSubCategory": "Expense Management",
       "operatingSystem": "Web, iOS, Android",
-      "browserRequirements": "Requires JavaScript",
+      "browserRequirements": "Chrome, Firefox, Safari, Edge (JavaScript required)",
+      "inLanguage": "en-US",
+      "isAccessibleForFree": true,
+      "screenshot": "https://split-striker-1.onrender.com/og-image.svg",
+      "image": "https://split-striker-1.onrender.com/favicon.svg",
       "offers": {
         "@type": "Offer",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "description": "Free — no credit card required"
       },
       "featureList": [
-        "Split bills with groups",
-        "Track shared expenses",
-        "Settle debts easily",
-        "Multiple currencies",
-        "Expense history"
+        "Split bills equally or by custom amounts",
+        "Track shared expenses with groups and friends",
+        "Real-time balance calculation",
+        "Settle debts and track payments",
+        "Multiple currency support",
+        "Invite friends via shareable links",
+        "Smart debt simplification",
+        "Group activity history",
+        "Email & password authentication",
+        "Mobile-friendly design"
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Parmanand Prajapati"
+      }
+    }
+    </script>
+
+    <!-- Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Split Striker",
+      "url": "https://split-striker-1.onrender.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://split-striker-1.onrender.com/favicon.svg",
+        "width": 512,
+        "height": 512
+      },
+      "description": "Split Striker — The free, fast expense-splitting app for friends and groups.",
+      "foundingDate": "2024",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "availableLanguage": "English"
+      }
+    }
+    </script>
+
+    <!-- WebPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Split Striker — Split Expenses, Stay Friends",
+      "url": "https://split-striker-1.onrender.com/",
+      "description": "Free expense-splitting app. Split bills, track group expenses, settle debts.",
+      "inLanguage": "en-US",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Split Striker",
+        "url": "https://split-striker-1.onrender.com",
+        "description": "Free expense splitting app for friends and groups",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://split-striker-1.onrender.com/login"
+          },
+          "query-input": "required"
+        }
+      },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://split-striker-1.onrender.com/og-image.svg"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://split-striker-1.onrender.com/"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Split Striker free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Split Striker is completely free. No credit card required, no ads, no hidden fees."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I split expenses with friends?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sign up for free, create a group, invite your friends using a shareable link, and start adding expenses. Split Striker automatically calculates who owes what and suggests the simplest settlement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use Split Striker for group trips?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely! Split Striker is perfect for group travel, shared apartments, and any situation where multiple people share costs. It supports multiple currencies and exchange rates too."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Split Striker a Splitwise alternative?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Split Striker offers all the core features of Splitwise — group expenses, bill splitting, debt tracking, and settlement suggestions — with a modern interface and no ads."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I invite friends to my expense group?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In your group settings, click 'Generate invite link'. Share the link with friends — anyone who clicks it can join your group instantly."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Split Striker work on mobile?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Split Striker is fully responsive and works great on phones, tablets, and desktops. You can also add it to your home screen as a PWA."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What currencies does Split Striker support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Split Striker supports any currency. You can set a default currency per group and add expenses in different currencies with custom exchange rates."
+          }
+        }
       ]
     }
     </script>

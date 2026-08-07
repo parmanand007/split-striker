@@ -1,8 +1,26 @@
+# Split Striker — robots.txt
+# https://split-striker-1.onrender.com
+
 User-agent: *
 Allow: /
-
-# Block non-public routes from indexing
+Allow: /login
 Disallow: /groups/
+Disallow: /invite/
 Disallow: /dev/
+Disallow: /*?next=
+Disallow: /*?redirect=
+
+# Google
+User-agent: Googlebot
+Allow: /
+Allow: /login
+Disallow: /groups/
+Disallow: /invite/
+Disallow: /dev/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 5
 
 Sitemap: https://split-striker-1.onrender.com/sitemap.xml

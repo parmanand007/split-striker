@@ -1,0 +1,33 @@
+{
+  "name": "Split Striker",
+  "short_name": "Split Striker",
+  "description": "Free expense-splitting app for friends, roommates, and travel groups. Track who owes what and settle up in seconds.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0c1219",
+  "theme_color": "#be1240",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["finance", "utilities", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Sign In",
+      "short_name": "Sign In",
+      "description": "Sign in to your Split Striker account",
+      "url": "/login",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

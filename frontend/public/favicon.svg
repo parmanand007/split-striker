@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7f0e26"/>
+      <stop offset="55%" stop-color="#be1240"/>
+      <stop offset="100%" stop-color="#e63358"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0%" y1="0%" x2="30%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Glass gloss overlay -->
+  <rect width="512" height="512" rx="112" fill="url(#gloss)"/>
+  <!-- Lightning bolt (Zap icon, centered, white) -->
+  <path
+    d="M292 60 L148 276 h108 L220 452 L364 236 h-108 Z"
+    fill="white"
+    stroke="white"
+    stroke-width="4"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+    style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4))"
+  />
+</svg>

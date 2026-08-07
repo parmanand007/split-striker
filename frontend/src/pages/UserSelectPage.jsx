@@ -8,7 +8,7 @@ import Logo from '../components/Logo'
 export default function UserSelectPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const redirectTo = searchParams.get('next') || searchParams.get('redirect') || '/'
+  const redirectTo = searchParams.get('next') || searchParams.get('redirect') || '/groups'
   const { login, currentUser } = useCurrentUser()
 
   const [mode, setMode] = useState('login') // 'login' | 'signup'
