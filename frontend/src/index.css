@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { font-feature-settings: "cv02","cv03","cv04","cv11"; }
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  ::selection { @apply bg-brand-100 text-brand-900; }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-300; }
+}
+
+@layer components {
+  .input {
+    @apply w-full border border-slate-200 rounded-xl px-3 py-2 text-sm
+           focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-400
+           placeholder:text-slate-400 bg-white transition-colors;
+  }
+  .btn-primary {
+    @apply px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-xl
+           hover:bg-brand-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl
+           hover:bg-slate-50 active:scale-[0.98] transition-all disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply px-3 py-1.5 text-slate-500 text-sm font-medium rounded-lg
+           hover:bg-slate-100 active:scale-[0.98] transition-all;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-slate-100 shadow-card;
+  }
+  .card-hover {
+    @apply card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-150;
+  }
+  .badge-positive {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
+           bg-positive-50 text-positive-700 border border-positive-100;
+  }
+  .badge-negative {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
+           bg-negative-50 text-negative-700 border border-negative-100;
+  }
+  .badge-neutral {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+           bg-slate-100 text-slate-500 border border-slate-200;
+  }
+  /* Skeleton loader */
+  .skeleton {
+    @apply bg-slate-200 rounded-lg animate-pulse;
+  }
+}
