@@ -7,7 +7,7 @@ A full-featured expense-splitting app — Splitwise mechanics rebuilt from scrat
 ### Backend
 
 ```bash
-cd backend
+cd backendd
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
