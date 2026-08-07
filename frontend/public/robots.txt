@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yourdomain.com/sitemap.xml
+# Block non-public routes from indexing
+Disallow: /groups/
+Disallow: /dev/
+
+Sitemap: https://split-striker-1.onrender.com/sitemap.xml

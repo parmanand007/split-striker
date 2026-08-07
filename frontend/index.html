@@ -4,31 +4,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Anti-FOUC: apply saved theme before React renders -->
+    <script>
+      (function() {
+        var valid = ['maroon','forest','amber','olive','teal','rust'];
+        var saved = localStorage.getItem('split_striker_theme');
+        var theme = valid.indexOf(saved) !== -1 ? saved : 'maroon';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.classList.add('dark');
+      })();
+    </script>
+
     <!-- Primary Meta -->
     <title>Split Striker — Split Expenses, Stay Friends</title>
-    <meta name="description" content="Split Striker makes splitting bills with friends and groups effortless. Track who owes what, settle up instantly, and keep your friendships intact." />
-    <meta name="keywords" content="split expenses, expense tracker, bill splitting, group expenses, splitwise alternative, split bills, shared expenses" />
+    <meta name="description" content="Split Striker makes splitting bills with friends and groups effortless. Track who owes what, settle up instantly, and keep your friendships intact. Free, fast, no sign-up hassle." />
+    <meta name="keywords" content="split expenses, expense tracker, bill splitting, group expenses, splitwise alternative, split bills, shared expenses, expense sharing app, money split, group trip expenses" />
     <meta name="author" content="Split Striker" />
-    <meta name="theme-color" content="#6366f1" />
-    <link rel="canonical" href="https://yourdomain.com/" />
+    <meta name="theme-color" content="#dc2638" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://split-striker-1.onrender.com/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://yourdomain.com/" />
+    <meta property="og:url" content="https://split-striker-1.onrender.com/" />
     <meta property="og:title" content="Split Striker — Split Expenses, Stay Friends" />
-    <meta property="og:description" content="Track shared expenses, settle balances, and split bills fairly with friends and groups. Fast, simple, free." />
-    <meta property="og:image" content="https://yourdomain.com/og-image.png" />
+    <meta property="og:description" content="Track shared expenses, settle balances, and split bills fairly with friends and groups. Fast, simple, free. No credit card required." />
+    <meta property="og:image" content="https://split-striker-1.onrender.com/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Split Striker — Expense splitting made easy" />
     <meta property="og:site_name" content="Split Striker" />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://yourdomain.com/" />
+    <meta name="twitter:url" content="https://split-striker-1.onrender.com/" />
     <meta name="twitter:title" content="Split Striker — Split Expenses, Stay Friends" />
     <meta name="twitter:description" content="Track shared expenses, settle balances, and split bills fairly with friends and groups." />
-    <meta name="twitter:image" content="https://yourdomain.com/og-image.png" />
+    <meta name="twitter:image" content="https://split-striker-1.onrender.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Split Striker app preview" />
 
     <!-- PWA / App -->
     <meta name="application-name" content="Split Striker" />
@@ -42,32 +57,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <!-- Anti-FOUC: apply saved theme before React renders -->
-    <script>
-      (function() {
-        var valid = ['maroon','forest','amber','olive','teal','rust'];
-        var saved = localStorage.getItem('split_striker_theme');
-        var theme = valid.indexOf(saved) !== -1 ? saved : 'maroon';
-        document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.classList.add('dark');
-      })();
-    </script>
-
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Split Striker",
-      "url": "https://yourdomain.com",
-      "description": "Split expenses with friends and groups. Track who owes what and settle up easily.",
+      "url": "https://split-striker-1.onrender.com",
+      "description": "Split expenses with friends and groups. Track who owes what and settle up easily. Free expense splitting app.",
       "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Web",
+      "operatingSystem": "Web, iOS, Android",
+      "browserRequirements": "Requires JavaScript",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
-      }
+      },
+      "featureList": [
+        "Split bills with groups",
+        "Track shared expenses",
+        "Settle debts easily",
+        "Multiple currencies",
+        "Expense history"
+      ]
     }
     </script>
   </head>
