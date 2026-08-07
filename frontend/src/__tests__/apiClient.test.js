@@ -43,22 +43,26 @@ describe('API client', () => {
     expect(result.name).toBe('Trip')
   })
 
-  it('loginByEmail posts to /users/login', async () => {
-    const user = { id: 1, name: 'Alice', email: 'a@test.com' }
-    mockFetch.mockResolvedValueOnce(mockResponse(user))
-    const result = await api.loginByEmail('a@test.com')
+  it('authLogin posts to /auth/login', async () => {
+    const payload = { token: 'jwt.token.here', user: { id: 1, name: 'Alice', email: 'a@test.com' } }
+    mockFetch.mockResolvedValueOnce(mockResponse(payload))
+    const result = await api.authLogin('a@test.com', 'secret')
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/login'),
+      expect.stringContaining('/auth/login'),
       expect.objectContaining({ method: 'POST' })
     )
-    expect(result).toMatchObject({ email: 'a@test.com' })
+    expect(result.token).toBe('jwt.token.here')
   })
 
-  it('createUser posts name+email to /users', async () => {
-    const user = { id: 1, name: 'Alice', email: 'a@test.com' }
-    mockFetch.mockResolvedValueOnce(mockResponse(user, 201))
-    const result = await api.createUser('Alice', 'a@test.com')
-    expect(result).toMatchObject({ name: 'Alice' })
+  it('authSignup posts name+email+password to /auth/signup', async () => {
+    const payload = { token: 'jwt.token.here', user: { id: 1, name: 'Alice', email: 'a@test.com' } }
+    mockFetch.mockResolvedValueOnce(mockResponse(payload, 201))
+    const result = await api.authSignup('Alice', 'a@test.com', 'secret')
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/signup'),
+      expect.objectContaining({ method: 'POST' })
+    )
+    expect(result.user.name).toBe('Alice')
   })
 
   it('getUser calls /users/:id', async () => {

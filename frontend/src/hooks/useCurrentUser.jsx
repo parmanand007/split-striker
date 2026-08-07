@@ -30,14 +30,16 @@ export function CurrentUserProvider({ children }) {
     }
   }, [])
 
-  function login(user) {
+  function login(user, token) {
     setCurrentUser(user)
     localStorage.setItem('split_striker_user', JSON.stringify(user))
+    if (token) localStorage.setItem('split_striker_token', token)
   }
 
   function logout() {
     setCurrentUser(null)
     localStorage.removeItem('split_striker_user')
+    localStorage.removeItem('split_striker_token')
   }
 
   return (

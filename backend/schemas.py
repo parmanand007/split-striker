@@ -18,10 +18,19 @@ class DecimalModel(BaseModel):
 
 class UserCreate(BaseModel):
     name: str
-    email: str
+    email: Optional[str] = None
 
 class LoginByEmail(BaseModel):
     email: str
+
+class SignupBody(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class LoginBody(BaseModel):
+    email: str
+    password: str
 
 
 class UserOut(BaseModel):
@@ -30,6 +39,11 @@ class UserOut(BaseModel):
     email: Optional[str]
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class AuthOut(BaseModel):
+    token: str
+    user: UserOut
 
 
 class UserSummary(BaseModel):

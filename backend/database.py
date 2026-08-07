@@ -29,6 +29,7 @@ def run_migrations():
         "ALTER TABLE groups ADD COLUMN emoji TEXT",
         "ALTER TABLE users ADD COLUMN avatar_color TEXT",
         "ALTER TABLE expenses ADD COLUMN notes TEXT",
+        "ALTER TABLE users ADD COLUMN password_hash TEXT",
     ]
     with engine.connect() as conn:
         for sql in migrations:

@@ -183,6 +183,54 @@ class TestUsers:
 
 
 # ════════════════════════════════════════════════════════════════════════════
+# AUTH
+# ════════════════════════════════════════════════════════════════════════════
+
+class TestAuth:
+    def test_signup_creates_user_and_returns_token(self, client):
+        r = client.post("/api/auth/signup", json={"name": "Alice", "email": "a@t.com", "password": "secret123"})
+        assert r.status_code == 201
+        d = r.json()
+        assert "token" in d
+        assert d["user"]["name"] == "Alice"
+        assert d["user"]["email"] == "a@t.com"
+
+    def test_login_returns_token(self, client):
+        client.post("/api/auth/signup", json={"name": "Alice", "email": "a@t.com", "password": "secret123"})
+        r = client.post("/api/auth/login", json={"email": "a@t.com", "password": "secret123"})
+        assert r.status_code == 200
+        d = r.json()
+        assert "token" in d
+        assert d["user"]["email"] == "a@t.com"
+
+    def test_login_wrong_password_401(self, client):
+        client.post("/api/auth/signup", json={"name": "Alice", "email": "a@t.com", "password": "secret123"})
+        r = client.post("/api/auth/login", json={"email": "a@t.com", "password": "wrongpass"})
+        assert r.status_code == 401
+
+    def test_login_unknown_email_401(self, client):
+        r = client.post("/api/auth/login", json={"email": "ghost@t.com", "password": "any"})
+        assert r.status_code == 401
+
+    def test_signup_duplicate_email_400(self, client):
+        client.post("/api/auth/signup", json={"name": "Alice", "email": "a@t.com", "password": "secret123"})
+        r = client.post("/api/auth/signup", json={"name": "Bob", "email": "a@t.com", "password": "other"})
+        assert r.status_code == 400
+        assert "already exists" in r.json()["detail"].lower()
+
+    def test_login_email_case_insensitive(self, client):
+        client.post("/api/auth/signup", json={"name": "Alice", "email": "a@t.com", "password": "secret123"})
+        r = client.post("/api/auth/login", json={"email": "A@T.COM", "password": "secret123"})
+        assert r.status_code == 200
+
+    def test_user_without_password_cannot_login(self, client):
+        # user created via old /api/users path (no password)
+        mk_user(client, "NoPass", "nopass@t.com")
+        r = client.post("/api/auth/login", json={"email": "nopass@t.com", "password": "anything"})
+        assert r.status_code == 401
+
+
+# ════════════════════════════════════════════════════════════════════════════
 # GROUPS
 # ════════════════════════════════════════════════════════════════════════════
 

@@ -5,7 +5,7 @@ from database import engine, Base, run_migrations
 import models  # noqa: register models before create_all
 
 from routers import users, groups, expenses, payments, balances, activity, test_suite
-from routers import invites, edit_requests
+from routers import invites, edit_requests, auth
 
 Base.metadata.create_all(bind=engine)
 run_migrations()
@@ -34,6 +34,7 @@ app.include_router(activity.router)
 app.include_router(test_suite.router)
 app.include_router(invites.router)
 app.include_router(edit_requests.router)
+app.include_router(auth.router)
 
 
 @app.get("/api/health")

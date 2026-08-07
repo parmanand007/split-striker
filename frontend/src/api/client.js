@@ -1,9 +1,17 @@
 const BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 
+function getToken() {
+  return localStorage.getItem('split_striker_token')
+}
+
 async function req(method, path, body) {
+  const token = getToken()
   const opts = {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   }
   if (body !== undefined) opts.body = JSON.stringify(body)
   const res = await fetch(BASE + path, opts)
@@ -16,7 +24,11 @@ async function req(method, path, body) {
 }
 
 export const api = {
-  // Users
+  // Auth (email + password)
+  authSignup: (name, email, password) => req('POST', '/auth/signup', { name, email, password }),
+  authLogin: (email, password) => req('POST', '/auth/login', { email, password }),
+
+  // Users (legacy / internal)
   loginByEmail: (email) => req('POST', '/users/login', { email }),
   createUser: (name, email) => req('POST', '/users', { name, email }),
   getUsers: () => req('GET', '/users'),
