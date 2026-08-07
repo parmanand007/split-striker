@@ -19,6 +19,7 @@ export const api = {
   // Users
   loginByEmail: (email) => req('POST', '/users/login', { email }),
   createUser: (name, email) => req('POST', '/users', { name, email }),
+  getUsers: () => req('GET', '/users'),
   getUser: (id) => req('GET', `/users/${id}`),
   getUserSummary: (id) => req('GET', `/users/${id}/summary`),
   getUserActivity: (id) => req('GET', `/users/${id}/activity`),
