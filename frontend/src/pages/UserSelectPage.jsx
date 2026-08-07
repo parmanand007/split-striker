@@ -72,22 +72,22 @@ export default function UserSelectPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 overflow-hidden relative select-none transition-colors duration-300"
-      style={{ background: 'var(--login-bg)' }}
+      className="min-h-screen flex items-center justify-center p-4 overflow-hidden relative select-none"
+      style={{ background: 'linear-gradient(145deg, #080d14 0%, #0e1825 55%, #080d14 100%)' }}
     >
-      {/* Animated background blobs */}
+      {/* Themed colour blobs — give each theme its identity even on the dark base */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-15%] right-[-10%] w-[520px] h-[520px] rounded-full blur-[110px] animate-float-slow"
-          style={{ background: 'rgba(var(--blob-a),0.25)' }} />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[420px] h-[420px] rounded-full blur-[100px] animate-float-med"
-          style={{ background: 'rgba(var(--blob-b),0.2)' }} />
+        <div className="absolute top-[-15%] right-[-10%] w-[520px] h-[520px] rounded-full blur-[120px] animate-float-slow"
+          style={{ background: 'rgba(var(--blob-a),0.30)' }} />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[420px] h-[420px] rounded-full blur-[110px] animate-float-med"
+          style={{ background: 'rgba(var(--blob-b),0.22)' }} />
         <div className="absolute top-[40%] left-[30%] w-[260px] h-[260px] rounded-full blur-[80px] animate-float-fast"
           style={{ background: 'rgba(var(--blob-c),0.15)', animationDelay: '1.5s' }} />
       </div>
 
       {/* Dot grid */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)',
+        backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)',
         backgroundSize: '28px 28px',
       }} />
 
