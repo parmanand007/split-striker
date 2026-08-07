@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Link2, Copy, Check, CheckCircle2, XCircle, Clock, Trash2 } from 'lucide-react'
+import { ArrowLeft, Link2, Copy, Check, CheckCircle2, XCircle, Clock, Trash2, AlertTriangle, Loader2 } from 'lucide-react'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 
@@ -24,6 +24,9 @@ export default function GroupSettingsPage() {
   const [copied, setCopied] = useState(false)
   const [editRequests, setEditRequests] = useState([])
   const [reviewingId, setReviewingId] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   const isOwner = group?.created_by_id === currentUser?.id
 
@@ -117,6 +120,19 @@ export default function GroupSettingsPage() {
     }
   }
 
+  async function handleDeleteGroup() {
+    setDeleting(true)
+    try {
+      await api.deleteGroup(id, currentUser.id)
+      navigate('/')
+    } catch (err) {
+      setError(err.message)
+      setShowDeleteConfirm(false)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (!group) return (
     <div className="flex items-center justify-center h-64">
       <div className="w-6 h-6 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
@@ -187,37 +203,42 @@ export default function GroupSettingsPage() {
 
       {/* Settings form */}
       <div className="card p-5 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">General</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-700">General</h2>
+          {!isOwner && <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">view only</span>}
+        </div>
         <form onSubmit={saveSettings} className="space-y-4">
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Group name</label>
-              <input value={name} onChange={e => setName(e.target.value)} className="input" />
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Group name</label>
+              <input value={name} onChange={e => setName(e.target.value)} className="input" disabled={!isOwner} />
             </div>
             <div className="w-24">
-              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Emoji</label>
-              <input value={emoji} onChange={e => setEmoji(e.target.value)} className="input text-center text-lg" placeholder="✈️" maxLength={2} />
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">Emoji</label>
+              <input value={emoji} onChange={e => setEmoji(e.target.value)} className="input text-center text-lg" placeholder="✈️" maxLength={2} disabled={!isOwner} />
             </div>
           </div>
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" checked={archived} onChange={e => setArchived(e.target.checked)} className="accent-brand-600 w-4 h-4 rounded" />
+          <label className={`flex items-center gap-3 ${isOwner ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}`}>
+            <input type="checkbox" checked={archived} onChange={e => isOwner && setArchived(e.target.checked)} className="accent-brand-600 w-4 h-4 rounded" disabled={!isOwner} />
             <div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Archive group</span>
+              <span className="text-sm font-medium text-slate-700">Archive group</span>
               <p className="text-xs text-slate-400">No new expenses or payments.</p>
             </div>
           </label>
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" checked={simplify} onChange={e => setSimplify(e.target.checked)} className="accent-brand-600 w-4 h-4 rounded" />
+          <label className={`flex items-center gap-3 ${isOwner ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}`}>
+            <input type="checkbox" checked={simplify} onChange={e => isOwner && setSimplify(e.target.checked)} className="accent-brand-600 w-4 h-4 rounded" disabled={!isOwner} />
             <div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Simplify debts</span>
+              <span className="text-sm font-medium text-slate-700">Simplify debts</span>
               <p className="text-xs text-slate-400">Show fewest possible transactions to settle up.</p>
             </div>
           </label>
           {error && <p className="text-negative-600 text-xs bg-negative-50 px-3 py-2 rounded-lg">{error}</p>}
           {success && <p className="text-positive-600 text-xs bg-positive-50 px-3 py-2 rounded-lg">{success}</p>}
-          <button type="submit" disabled={saving} className="btn-primary">
-            {saving ? 'Saving…' : 'Save settings'}
-          </button>
+          {isOwner && (
+            <button type="submit" disabled={saving} className="btn-primary">
+              {saving ? 'Saving…' : 'Save settings'}
+            </button>
+          )}
         </form>
       </div>
 
@@ -288,7 +309,7 @@ export default function GroupSettingsPage() {
         </div>
 
         {nonMembers.length > 0 && isOwner && (
-          <form onSubmit={addMember} className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+          <form onSubmit={addMember} className="flex gap-2 pt-3 border-t border-slate-100">
             <select value={addUserId} onChange={e => setAddUserId(e.target.value)} className="input flex-1 text-sm">
               <option value="">Add a member…</option>
               {nonMembers.map(u => (
@@ -301,6 +322,81 @@ export default function GroupSettingsPage() {
           </form>
         )}
       </div>
+
+      {/* Danger zone — owner only */}
+      {isOwner && (
+        <div className="card p-5 border-negative-200 bg-negative-50/30">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle size={15} className="text-negative-500" />
+            <h2 className="text-sm font-semibold text-negative-700">Danger zone</h2>
+          </div>
+          <p className="text-xs text-slate-500 mb-4">
+            Permanently delete this group and all its expenses, payments, and history.
+            This cannot be undone.
+          </p>
+          <button
+            onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText('') }}
+            className="btn-danger text-sm flex items-center gap-2"
+          >
+            <Trash2 size={14} /> Delete group
+          </button>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-white rounded-3xl shadow-modal w-full max-w-sm p-6 animate-slide-up">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-negative-100 flex items-center justify-center flex-none">
+                <AlertTriangle size={20} className="text-negative-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">Delete group?</h3>
+                <p className="text-xs text-slate-400">This will permanently delete everything.</p>
+              </div>
+            </div>
+
+            <div className="bg-negative-50 rounded-xl p-3 mb-4 text-xs text-negative-700 space-y-1">
+              <p>• All expenses will be deleted</p>
+              <p>• All payments will be deleted</p>
+              <p>• All activity history will be deleted</p>
+              <p>• This cannot be undone</p>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Type <span className="font-bold text-slate-900">"{group.name}"</span> to confirm
+              </label>
+              <input
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                className="input"
+                placeholder={group.name}
+                autoFocus
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteGroup}
+                disabled={deleteConfirmText !== group.name || deleting}
+                className="btn-danger flex-1 flex items-center justify-center gap-2"
+              >
+                {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                {deleting ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

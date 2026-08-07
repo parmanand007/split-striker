@@ -29,6 +29,7 @@ export const api = {
   createGroup: (data) => req('POST', '/groups', data),
   getGroup: (id) => req('GET', `/groups/${id}`),
   updateGroup: (id, data) => req('PUT', `/groups/${id}`, data),
+  deleteGroup: (id, actorId) => req('DELETE', `/groups/${id}?actor_user_id=${actorId}`),
   addMember: (groupId, userId) => req('POST', `/groups/${groupId}/members`, { user_id: userId }),
   removeMember: (groupId, userId) => req('DELETE', `/groups/${groupId}/members/${userId}`),
 

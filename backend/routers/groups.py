@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Group, User, ActivityLog, ActionType, EntityType
+from models import Group, User, Expense, Payment, ActivityLog, ActionType, EntityType
 from schemas import GroupCreate, GroupOut, GroupUpdate, AddMemberRequest
 
 router = APIRouter(prefix="/api/groups", tags=["groups"])
@@ -81,6 +81,19 @@ def update_group(group_id: int, body: GroupUpdate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(group)
     return group
+
+
+@router.delete("/{group_id}", status_code=204)
+def delete_group(group_id: int, actor_user_id: int, db: Session = Depends(get_db)):
+    group = _get_group(group_id, db)
+    if group.created_by_id != actor_user_id:
+        raise HTTPException(403, "Only the group owner can delete this group.")
+    # Remove child records manually (group_id is SET NULL for expenses/payments)
+    db.query(Expense).filter(Expense.group_id == group_id).delete(synchronize_session=False)
+    db.query(Payment).filter(Payment.group_id == group_id).delete(synchronize_session=False)
+    db.query(ActivityLog).filter(ActivityLog.group_id == group_id).delete(synchronize_session=False)
+    db.delete(group)
+    db.commit()
 
 
 @router.post("/{group_id}/members", response_model=GroupOut)
