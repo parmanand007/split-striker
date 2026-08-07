@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
 export const THEMES = [
-  { id: 'maroon', label: 'Maroon', swatch: '#dc2638', swatchB: '#b9142a' },
-  { id: 'forest', label: 'Forest', swatch: '#22c55e', swatchB: '#10b981' },
-  { id: 'amber',  label: 'Amber',  swatch: '#f59e0b', swatchB: '#f97316' },
-  { id: 'olive',  label: 'Olive',  swatch: '#84cc16', swatchB: '#22c55e' },
-  { id: 'teal',   label: 'Teal',   swatch: '#14b8a6', swatchB: '#22c55e' },
-  { id: 'rust',   label: 'Rust',   swatch: '#ea580c', swatchB: '#dc2638' },
+  { id: 'maroon', label: 'Maroon', swatch: '#be1240', swatchB: '#f6f1f2' },
+  { id: 'forest', label: 'Forest', swatch: '#15803d', swatchB: '#f0f5f1' },
+  { id: 'amber',  label: 'Amber',  swatch: '#d97706', swatchB: '#fdf8ee' },
+  { id: 'olive',  label: 'Olive',  swatch: '#65a30d', swatchB: '#f4f6ee' },
+  { id: 'teal',   label: 'Teal',   swatch: '#0d9488', swatchB: '#eef6f5' },
+  { id: 'rust',   label: 'Rust',   swatch: '#c2410c', swatchB: '#f8f0ea' },
 ]
 
 const STORAGE_KEY = 'split_striker_theme'
@@ -17,7 +17,7 @@ const ThemeContext = createContext(null)
 function applyTheme(id) {
   const html = document.documentElement
   html.setAttribute('data-theme', id)
-  html.classList.add('dark')
+  html.classList.remove('dark')
 }
 
 export function ThemeProvider({ children }) {

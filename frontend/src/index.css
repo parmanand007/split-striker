@@ -3,33 +3,34 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════
-   THEME SYSTEM — 6 color themes, always dark mode
+   THEME SYSTEM — 6 light/white themes
    CSS variables drive brand colors + structural colors.
    Swap data-theme attribute on <html> to switch.
    ═══════════════════════════════════════════════════ */
 
-/* ── 1. MAROON (deep burgundy / crimson) ── */
+/* ── 1. MAROON (crimson / burgundy) ── */
 :root, [data-theme="maroon"] {
   --brand-50:  255 241 242;
   --brand-100: 254 220 224;
   --brand-200: 252 181 189;
   --brand-300: 249 130 144;
-  --brand-400: 244 80  100;
-  --brand-500: 220 38  60;
-  --brand-600: 185 20  42;
-  --brand-700: 154 14  35;
-  --brand-800: 128 14  34;
-  --brand-900: 108 18  34;
-  --brand-950: 64  5   17;
+  --brand-400: 230 60  80;
+  --brand-500: 190 18  60;
+  --brand-600: 159 14  48;
+  --brand-700: 128 12  38;
+  --brand-800: 104 10  30;
+  --brand-900: 82  8   24;
+  --brand-950: 48  4   14;
 
-  --sidebar-bg:  #3a0810;
-  --page-bg:     #4d0d17;
-  --card-bg:     #5e1422;
-  --card-border: #7a2035;
+  --sidebar-bg:  #f6f1f2;
+  --page-bg:     #fafafa;
+  --card-bg:     #ffffff;
+  --card-border: #f0d4d8;
+  --btn-primary-text: #000000;
   --blob-a: 220 38  60;
   --blob-b: 251 146 60;
   --blob-c: 245 158 11;
-  --login-bg: linear-gradient(145deg, #3a0a12 0%, #520e1a 50%, #28060a 100%);
+  --login-bg: linear-gradient(145deg, #fff5f6 0%, #ffeced 50%, #fff9fa 100%);
 }
 
 /* ── 2. FOREST (deep forest green) ── */
@@ -38,46 +39,48 @@
   --brand-100: 220 252 231;
   --brand-200: 187 247 208;
   --brand-300: 134 239 172;
-  --brand-400: 74  222 128;
-  --brand-500: 34  197 94;
-  --brand-600: 22  163 74;
-  --brand-700: 21  128 61;
-  --brand-800: 22  101 52;
-  --brand-900: 20  83  45;
-  --brand-950: 5   46  22;
+  --brand-400: 50  180 90;
+  --brand-500: 21  128 61;
+  --brand-600: 18  108 52;
+  --brand-700: 14  88  42;
+  --brand-800: 12  72  34;
+  --brand-900: 10  58  28;
+  --brand-950: 4   30  12;
 
-  --sidebar-bg:  #0a2e12;
-  --page-bg:     #0d3d18;
-  --card-bg:     #124e20;
-  --card-border: #1c6830;
+  --sidebar-bg:  #f0f5f1;
+  --page-bg:     #f8fbf8;
+  --card-bg:     #ffffff;
+  --card-border: #c8e6d0;
+  --btn-primary-text: #000000;
   --blob-a: 34  197 94;
   --blob-b: 132 204 22;
   --blob-c: 16  185 129;
-  --login-bg: linear-gradient(145deg, #0a3015 0%, #104020 50%, #062010 100%);
+  --login-bg: linear-gradient(145deg, #f0faf2 0%, #e6f5ea 50%, #f8fcf8 100%);
 }
 
-/* ── 3. AMBER (warm gold / honey) ── */
+/* ── 3. AMBER (mustard / warm gold) ── */
 [data-theme="amber"] {
   --brand-50:  255 251 235;
   --brand-100: 254 243 199;
   --brand-200: 253 230 138;
   --brand-300: 252 211 77;
-  --brand-400: 251 191 36;
-  --brand-500: 245 158 11;
-  --brand-600: 217 119 6;
-  --brand-700: 180 83  9;
-  --brand-800: 146 64  14;
-  --brand-900: 120 53  15;
-  --brand-950: 69  26  3;
+  --brand-400: 235 155 20;
+  --brand-500: 217 119 6;
+  --brand-600: 180 96  4;
+  --brand-700: 146 74  4;
+  --brand-800: 120 60  4;
+  --brand-900: 96  48  4;
+  --brand-950: 60  28  2;
 
-  --sidebar-bg:  #3d2505;
-  --page-bg:     #503008;
-  --card-bg:     #63400c;
-  --card-border: #7d5518;
+  --sidebar-bg:  #fdf8ee;
+  --page-bg:     #fffbf5;
+  --card-bg:     #ffffff;
+  --card-border: #fde68a;
+  --btn-primary-text: #000000;
   --blob-a: 245 158 11;
   --blob-b: 251 191 36;
   --blob-c: 234 88  12;
-  --login-bg: linear-gradient(145deg, #3d2508 0%, #503010 50%, #281805 100%);
+  --login-bg: linear-gradient(145deg, #fffbec 0%, #fff6d0 50%, #fffdf5 100%);
 }
 
 /* ── 4. OLIVE (earthy olive / sage) ── */
@@ -86,46 +89,48 @@
   --brand-100: 236 252 203;
   --brand-200: 217 249 157;
   --brand-300: 190 242 100;
-  --brand-400: 163 230 53;
-  --brand-500: 132 204 22;
-  --brand-600: 101 163 13;
-  --brand-700: 77  124 15;
-  --brand-800: 63  98  18;
-  --brand-900: 54  83  19;
-  --brand-950: 26  46  5;
+  --brand-400: 130 195 30;
+  --brand-500: 101 163 13;
+  --brand-600: 84  136 10;
+  --brand-700: 68  110 8;
+  --brand-800: 55  90  6;
+  --brand-900: 44  72  6;
+  --brand-950: 22  38  2;
 
-  --sidebar-bg:  #222c05;
-  --page-bg:     #2c3808;
-  --card-bg:     #38490e;
-  --card-border: #4a5e18;
+  --sidebar-bg:  #f4f6ee;
+  --page-bg:     #f8fbf4;
+  --card-bg:     #ffffff;
+  --card-border: #d4e8b4;
+  --btn-primary-text: #000000;
   --blob-a: 132 204 22;
   --blob-b: 34  197 94;
   --blob-c: 245 158 11;
-  --login-bg: linear-gradient(145deg, #222c08 0%, #2c3a0a 50%, #161e04 100%);
+  --login-bg: linear-gradient(145deg, #f4f8ec 0%, #eaf2d8 50%, #f8fcf2 100%);
 }
 
-/* ── 5. TEAL (rich jade / deep teal) ── */
+/* ── 5. TEAL (jade / deep teal) ── */
 [data-theme="teal"] {
   --brand-50:  240 253 250;
   --brand-100: 204 251 241;
   --brand-200: 153 246 228;
   --brand-300: 94  234 212;
-  --brand-400: 45  212 191;
-  --brand-500: 20  184 166;
-  --brand-600: 13  148 136;
-  --brand-700: 15  118 110;
-  --brand-800: 17  94  89;
-  --brand-900: 19  78  74;
-  --brand-950: 4   47  46;
+  --brand-400: 28  190 172;
+  --brand-500: 13  148 136;
+  --brand-600: 11  124 114;
+  --brand-700: 9   100 92;
+  --brand-800: 8   78  72;
+  --brand-900: 6   60  56;
+  --brand-950: 2   32  30;
 
-  --sidebar-bg:  #063025;
-  --page-bg:     #0a4035;
-  --card-bg:     #0e5244;
-  --card-border: #166858;
+  --sidebar-bg:  #eef6f5;
+  --page-bg:     #f4fbfa;
+  --card-bg:     #ffffff;
+  --card-border: #b2e0da;
+  --btn-primary-text: #000000;
   --blob-a: 20  184 166;
   --blob-b: 34  197 94;
   --blob-c: 132 204 22;
-  --login-bg: linear-gradient(145deg, #063028 0%, #0a4038 50%, #042820 100%);
+  --login-bg: linear-gradient(145deg, #edfaf8 0%, #d8f4f1 50%, #f4fcfb 100%);
 }
 
 /* ── 6. RUST (terracotta / burnt sienna) ── */
@@ -134,22 +139,23 @@
   --brand-100: 255 231 204;
   --brand-200: 254 207 154;
   --brand-300: 253 176 94;
-  --brand-400: 251 140 40;
-  --brand-500: 234 88  12;
-  --brand-600: 194 65  12;
-  --brand-700: 154 52  18;
-  --brand-800: 124 45  18;
-  --brand-900: 100 38  16;
-  --brand-950: 55  17  5;
+  --brand-400: 230 100 35;
+  --brand-500: 194 65  12;
+  --brand-600: 160 52  10;
+  --brand-700: 130 42  8;
+  --brand-800: 104 34  6;
+  --brand-900: 82  26  4;
+  --brand-950: 48  14  2;
 
-  --sidebar-bg:  #3d1a06;
-  --page-bg:     #502310;
-  --card-bg:     #622e16;
-  --card-border: #7e3f22;
+  --sidebar-bg:  #f8f0ea;
+  --page-bg:     #fbf6f2;
+  --card-bg:     #ffffff;
+  --card-border: #f5d0b4;
+  --btn-primary-text: #000000;
   --blob-a: 234 88  12;
   --blob-b: 220 38  60;
   --blob-c: 245 158 11;
-  --login-bg: linear-gradient(145deg, #3d1a08 0%, #502512 50%, #281205 100%);
+  --login-bg: linear-gradient(145deg, #fdf4ee 0%, #fae8d8 50%, #fdf8f4 100%);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -160,29 +166,28 @@
   html {
     font-feature-settings: "cv02","cv03","cv04","cv11";
     transition: background-color 0.3s ease, color 0.3s ease;
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
     background: var(--page-bg);
-    @apply text-slate-100 antialiased;
+    @apply text-slate-900 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
-  /* Force dark styling on all inputs — prevents white autofill from browser */
   input, select, textarea {
-    color-scheme: dark;
+    color-scheme: light;
   }
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px rgba(0,0,0,0.5) inset !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-    caret-color: #f1f5f9;
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1e293b !important;
+    caret-color: #1e293b;
   }
-  ::selection { @apply bg-brand-600 text-white; }
+  ::selection { @apply bg-brand-500 text-white; }
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-600; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-400; }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -194,75 +199,76 @@
   .card {
     background: var(--card-bg);
     border-color: var(--card-border);
-    @apply rounded-2xl border shadow-card transition-all duration-200;
+    @apply rounded-2xl border shadow-sm transition-all duration-200;
   }
   .card-hover {
     background: var(--card-bg);
     border-color: var(--card-border);
-    @apply rounded-2xl border shadow-card hover:shadow-card-hover hover:-translate-y-0.5
+    @apply rounded-2xl border shadow-sm hover:shadow-md hover:-translate-y-0.5
            transition-all duration-200 cursor-pointer;
   }
 
   /* Inputs */
   .input {
-    background: color-mix(in srgb, var(--card-bg) 80%, transparent);
+    background: #ffffff;
     border-color: var(--card-border);
     @apply w-full rounded-xl px-3 py-2 text-sm border
-           text-slate-100 placeholder:text-slate-500
+           text-slate-800 placeholder:text-slate-400
            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500
            transition-all duration-150;
   }
 
   /* Buttons */
   .btn-primary {
-    @apply px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-xl
-           hover:bg-brand-500 active:scale-[0.97] transition-all duration-150
+    @apply px-4 py-2 bg-brand-500 text-sm font-semibold rounded-xl
+           hover:bg-brand-400 active:scale-[0.97] transition-all duration-150
            disabled:opacity-40 disabled:cursor-not-allowed shadow-sm;
+    color: var(--btn-primary-text);
   }
   .btn-secondary {
     border-color: var(--card-border);
     background: var(--card-bg);
-    @apply px-4 py-2 border text-slate-300 text-sm font-medium rounded-xl
-           hover:text-white hover:border-brand-500
+    @apply px-4 py-2 border text-slate-700 text-sm font-medium rounded-xl
+           hover:text-slate-900 hover:border-brand-500
            active:scale-[0.97] transition-all duration-150 disabled:opacity-40;
   }
   .btn-ghost {
-    @apply px-3 py-1.5 text-slate-400 text-sm font-medium rounded-lg
-           hover:bg-white/10 hover:text-slate-200
+    @apply px-3 py-1.5 text-slate-600 text-sm font-medium rounded-lg
+           hover:bg-slate-100 hover:text-slate-800
            active:scale-[0.97] transition-all duration-150;
   }
   .btn-danger {
     @apply px-4 py-2 bg-negative-600 text-white text-sm font-semibold rounded-xl
-           hover:bg-negative-500 active:scale-[0.97] transition-all duration-150 disabled:opacity-40;
+           hover:bg-negative-700 active:scale-[0.97] transition-all duration-150 disabled:opacity-40;
   }
 
   /* Badges */
   .badge-positive {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
-           bg-positive-500/15 text-positive-400 border border-positive-500/30;
+           bg-positive-100 text-positive-700 border border-positive-100;
   }
   .badge-negative {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
-           bg-negative-500/15 text-negative-400 border border-negative-500/30;
+           bg-negative-100 text-negative-700 border border-negative-100;
   }
   .badge-neutral {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-           bg-white/10 text-slate-400 border border-white/15;
+           bg-slate-100 text-slate-600 border border-slate-200;
   }
 
   /* Skeleton */
   .skeleton {
     @apply rounded-lg relative overflow-hidden;
-    background: var(--card-bg);
+    background: #f1f5f9;
     background-image: linear-gradient(90deg,
       transparent 0%,
-      rgba(255,255,255,0.06) 50%,
+      rgba(0,0,0,0.04) 50%,
       transparent 100%);
     background-size: 200% 100%;
     animation: shimmer 1.6s ease-in-out infinite;
   }
   .form-label {
-    @apply block text-xs font-semibold text-slate-400 mb-1.5;
+    @apply block text-xs font-semibold text-slate-600 mb-1.5;
   }
   .divider {
     border-color: var(--card-border);
@@ -301,7 +307,7 @@
 }
 @keyframes glow-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(var(--brand-500),0); }
-  50%      { box-shadow: 0 0 24px 6px rgba(var(--brand-500),0.3); }
+  50%      { box-shadow: 0 0 24px 6px rgba(var(--brand-500),0.2); }
 }
 @keyframes theme-swatch-in {
   from { opacity: 0; transform: scale(0.5); }
