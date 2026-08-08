@@ -1,17 +1,18 @@
 import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from dotenv import load_dotenv
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./split-striker.db")
+# Load .env from backend/ directory regardless of where the process is started
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 # SQLAlchemy requires postgresql:// not postgres://
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-_is_sqlite = DATABASE_URL.startswith("sqlite")
-connect_args = {"check_same_thread": False} if _is_sqlite else {}
-
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
