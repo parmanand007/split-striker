@@ -19,6 +19,7 @@ app.add_middleware(
         "http://localhost:3000",
         "https://lining-roundish-freeload.ngrok-free.dev",
         "https://split-striker-1.onrender.com",
+        "https://split-striker-wise.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
