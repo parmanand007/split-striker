@@ -195,8 +195,8 @@ export default function Sidebar({ onClose }) {
           </div>
         </div>
 
-        {/* Bottom area */}
-        <div className="p-3 border-t border-white/10">
+        {/* Bottom area — safe-bottom for iPhone home indicator */}
+        <div className="p-3 border-t border-white/10 safe-bottom">
           {/* Mini balance */}
           {summary && (
             <div className="px-3 py-2 mb-1">

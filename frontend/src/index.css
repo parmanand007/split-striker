@@ -7,6 +7,70 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
+/* ══════════════════════════════════════════════════════
+   MOBILE / CROSS-BROWSER COMPATIBILITY
+   Targets: Safari, Chrome, Brave, Firefox on iOS/Android
+   ══════════════════════════════════════════════════════ */
+
+/* Remove 300ms tap delay on buttons and links */
+button, a, [role="button"], label, select { touch-action: manipulation; }
+
+/* Remove iOS/Android blue tap highlight flash */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Prevent font scaling on orientation change (all browsers) */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Use dynamic viewport height — fixes the iOS bottom-bar collapsing bug
+   where 100vh is taller than the visible area in Safari/Brave */
+.h-screen { height: 100dvh; }
+.min-h-screen { min-height: 100dvh; }
+
+/* iOS momentum / rubber-band scrolling */
+.overflow-y-auto, main { -webkit-overflow-scrolling: touch; }
+
+/* ── iOS INPUT ZOOM FIX ────────────────────────────────
+   iOS Safari (and Brave on iOS) zooms in when an input's
+   font-size is < 16px. Force 16px on all mobile inputs.   */
+@media screen and (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ── DARK-BACKGROUND AUTOFILL ──────────────────────────
+   Browser autofill overrides background with yellow/blue.
+   For dark forms (login page), invert to dark fill.       */
+.dark-form input:-webkit-autofill,
+.dark-form input:-webkit-autofill:hover,
+.dark-form input:-webkit-autofill:focus,
+.dark-form input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0c1520 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+}
+
+/* ── SAFE AREA INSETS ─────────────────────────────────
+   iPhone 16 Dynamic Island / notch / home indicator     */
+.safe-top    { padding-top:    env(safe-area-inset-top,    0px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-left   { padding-left:   env(safe-area-inset-left,   0px); }
+.safe-right  { padding-right:  env(safe-area-inset-right,  0px); }
+
+/* ── MINIMUM TOUCH TARGETS ────────────────────────────
+   Apple HIG: 44×44pt minimum. Only for top-level nav.   */
+header button { min-height: 44px; min-width: 44px; }
+
+/* ── FIREFOX SCROLLBAR ────────────────────────────────*/
+* { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+
 /* ═══════════════════════════════════════════════════
    THEME SYSTEM — 6 light/white themes
    CSS variables drive brand colors + structural colors.

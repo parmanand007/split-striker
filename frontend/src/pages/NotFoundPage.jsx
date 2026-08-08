@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Home, ArrowLeft } from 'lucide-react'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 
 /* Floating particle — a single animated emoji */
 function Particle({ style, children }) {
@@ -27,6 +28,7 @@ const PARTICLES = [
 
 export default function NotFoundPage() {
   const navigate = useNavigate()
+  const { currentUser } = useCurrentUser()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -143,7 +145,7 @@ export default function NotFoundPage() {
               🤔
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: 'var(--text-primary, #f1f5f9)' }}>
             Lost in the split
           </h1>
         </div>
@@ -153,7 +155,7 @@ export default function NotFoundPage() {
           className="sub-enter mb-8"
           style={{ opacity: 0, animationDelay: '0.5s', animationFillMode: 'forwards' }}
         >
-          <p className="text-slate-500 text-base leading-relaxed">
+          <p className="text-slate-400 text-base leading-relaxed">
             This page doesn't exist — maybe someone forgot to<br className="hidden sm:block" />
             {' '}pay for it. Let's get you back on track.
           </p>
@@ -165,11 +167,11 @@ export default function NotFoundPage() {
           style={{ opacity: 0, animationDelay: '0.65s', animationFillMode: 'forwards' }}
         >
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate(currentUser ? '/groups' : '/login')}
             className="btn-primary flex items-center gap-2 px-6 py-3 text-base w-full sm:w-auto justify-center"
           >
             <Home size={17} />
-            Go home
+            {currentUser ? 'Go to dashboard' : 'Sign in'}
           </button>
           <button
             onClick={() => navigate(-1)}
@@ -181,20 +183,22 @@ export default function NotFoundPage() {
         </div>
 
         {/* Path hint */}
-        <div
-          className="sub-enter mt-8"
-          style={{ opacity: 0, animationDelay: '0.8s', animationFillMode: 'forwards' }}
-        >
-          <p className="text-xs text-slate-400">
-            Looking for a group invite?{' '}
-            <button
-              onClick={() => navigate('/login')}
-              className="text-brand-600 hover:text-brand-500 font-medium underline underline-offset-2 transition-colors"
-            >
-              Sign in here
-            </button>
-          </p>
-        </div>
+        {!currentUser && (
+          <div
+            className="sub-enter mt-8"
+            style={{ opacity: 0, animationDelay: '0.8s', animationFillMode: 'forwards' }}
+          >
+            <p className="text-xs text-slate-400">
+              Have an account?{' '}
+              <button
+                onClick={() => navigate('/login')}
+                className="text-brand-600 hover:text-brand-500 font-medium underline underline-offset-2 transition-colors"
+              >
+                Sign in here
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

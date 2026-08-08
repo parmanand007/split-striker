@@ -71,11 +71,12 @@ export default function UserSelectPage() {
   }
 
   const inputCls = (hasErr) =>
-    `w-full border rounded-2xl pl-10 pr-4 py-3.5 text-sm text-white placeholder:text-slate-500
+    `w-full border rounded-2xl pl-10 pr-4 py-3.5 text-white placeholder:text-slate-500
      focus:outline-none focus:ring-2 focus:border-brand-400 transition-all duration-200
      ${hasErr ? 'border-negative-500/70 focus:ring-negative-500/25' : 'border-white/15 focus:ring-brand-500/30'}`
 
-  const inputStyle = { background: 'rgba(0,0,0,0.35)', colorScheme: 'dark' }
+  // font-size 16px prevents iOS zoom-on-focus (browser zooms when < 16px)
+  const inputStyle = { background: 'rgba(0,0,0,0.35)', colorScheme: 'dark', fontSize: '16px' }
 
   return (
     <div
@@ -137,7 +138,7 @@ export default function UserSelectPage() {
               </>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-3 dark-form">
               {/* Name — signup only */}
               {mode === 'signup' && (
                 <div className="relative">
