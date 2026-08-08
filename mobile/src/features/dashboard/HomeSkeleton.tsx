@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useThemeStore } from '@/src/stores/themeStore';
 
 function Bone({ height, width, style }: { height: number; width?: number | `${number}%`; style?: object }) {
@@ -20,23 +20,23 @@ function Bone({ height, width, style }: { height: number; width?: number | `${nu
 }
 
 export function HomeSkeleton() {
+  const t = useThemeStore((s) => s.tokens);
   return (
-    <View style={styles.wrap}>
+    <View style={styles.wrap} accessibilityLabel="Loading home">
+      <Text style={{ color: t.textMuted, fontWeight: '600', marginBottom: 8 }}>Loading home…</Text>
       <Bone height={14} width="40%" />
       <Bone height={28} width="70%" style={{ marginTop: 8 }} />
-      <Bone height={72} style={{ marginTop: 20, borderRadius: 16 }} />
       <View style={styles.row}>
-        <Bone height={96} style={{ flex: 1, borderRadius: 16 }} />
-        <Bone height={96} style={{ flex: 1, borderRadius: 16 }} />
+        <Bone height={88} style={{ flex: 1, borderRadius: 16 }} />
+        <Bone height={88} style={{ flex: 1, borderRadius: 16 }} />
       </View>
-      <Bone height={44} style={{ marginTop: 8, borderRadius: 14 }} />
-      <Bone height={160} style={{ marginTop: 16, borderRadius: 16 }} />
-      <Bone height={160} style={{ marginTop: 16, borderRadius: 16 }} />
+      <Bone height={64} style={{ marginTop: 8, borderRadius: 14 }} />
+      <Bone height={120} style={{ marginTop: 12, borderRadius: 16 }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { padding: 16, gap: 4 },
-  row: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  wrap: { paddingHorizontal: 4, paddingTop: 4, gap: 4 },
+  row: { flexDirection: 'row', gap: 8, marginTop: 12 },
 });

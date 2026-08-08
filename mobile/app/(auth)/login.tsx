@@ -108,8 +108,9 @@ export default function LoginScreen() {
                 testID="login-password"
                 label="Password"
                 secureTextEntry
-                autoComplete="password"
-                textContentType="password"
+                autoComplete="off"
+                textContentType="none"
+                passwordRules=""
                 value={value}
                 onBlur={onBlur}
                 onChangeText={(text) => {

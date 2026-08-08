@@ -63,6 +63,7 @@ export default function HomeScreen() {
             style={[styles.name, { color: t.text }]}
             numberOfLines={1}
             testID="home-user-name"
+            accessibilityLabel={dash.user.name}
           >
             {dash.user.name}
           </Text>
@@ -438,7 +439,8 @@ const styles = StyleSheet.create({
   },
   greeting: { fontSize: 13, fontWeight: '600' },
   name: { fontSize: 24, fontWeight: '800', marginTop: 2 },
-  netBox: { alignItems: 'flex-end', maxWidth: '42%' },
+  // Leave room for Expo dev-client floating gear on the right edge in development.
+  netBox: { alignItems: 'flex-end', maxWidth: '38%', marginRight: 36 },
   netLabel: { fontSize: 11, fontWeight: '700', marginBottom: 2 },
   netValue: { fontSize: 15, fontWeight: '800' },
   statsRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },

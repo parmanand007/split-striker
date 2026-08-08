@@ -1,0 +1,10 @@
+appId: com.splitstriker.app
+---
+- runFlow:
+    when:
+      visible: "Not Now"
+    commands:
+      - tapOn: "Not Now"
+- extendedWaitUntil:
+    visible: ".*OWED.*|Loading home|E2E|Create group|Net balance|Settled"
+    timeout: 20000
