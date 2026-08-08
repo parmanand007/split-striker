@@ -14,7 +14,7 @@ uvicorn main:app --reload --port 8000
 
 API docs: http://localhost:8000/docs
 
-### Frontend
+### Frontend (web)
 
 ```bash
 cd frontend
@@ -24,14 +24,31 @@ npm run dev           # http://localhost:5173
 
 The Vite dev server proxies `/api/*` to `http://localhost:8000`.
 
+### Mobile (Expo)
+
+```bash
+cd mobile
+cp .env.example .env
+npm install
+npm start             # then press a / i, or scan QR with Expo Go
+```
+
+For emulators and phones, run the backend with `--host 0.0.0.0`. Prefer `EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api` locally (Android emulator is rewritten to `10.0.2.2`). Physical devices need your LAN IP.
+
+Full mobile docs: [`mobile/README.md`](mobile/README.md) (env vars, Android/iOS setup, EAS production builds, known limitations).
+
 ### Tests
 
 ```bash
 cd backend
-python -m pytest tests/test_core.py -v
+python -m pytest tests/ -v
+
+cd frontend && npm run test:run
+
+cd mobile && npm test && npm run typecheck && npm run lint
 ```
 
-All 38 tests cover rounding, multi-payer, partial settlement, and currency edge cases.
+Backend tests cover rounding, multi-payer, partial settlement, and currency edge cases.
 
 ---
 

@@ -6,13 +6,20 @@ from dotenv import load_dotenv
 # Load .env from backend/ directory regardless of where the process is started
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# SQLAlchemy requires postgresql:// not postgres://
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-engine = create_engine(DATABASE_URL)
+if DATABASE_URL:
+    # SQLAlchemy requires postgresql:// not postgres://
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    engine = create_engine(DATABASE_URL)
+else:
+    # Local default: SQLite file next to the backend package
+    db_path = os.path.join(os.path.dirname(__file__), "..", "split-striker.db")
+    engine = create_engine(
+        f"sqlite:///{os.path.abspath(db_path)}",
+        connect_args={"check_same_thread": False},
+    )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
