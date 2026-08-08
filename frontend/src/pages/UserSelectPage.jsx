@@ -21,6 +21,7 @@ export default function UserSelectPage() {
 
   const emailRef = useRef()
   const nameRef = useRef()
+  const passwordRef = useRef()
 
   useEffect(() => {
     if (currentUser) navigate(decodeURIComponent(redirectTo), { replace: true })
@@ -42,17 +43,23 @@ export default function UserSelectPage() {
     e.preventDefault()
     setError('')
 
-    if (!email.trim()) return setError('Email is required.')
-    if (!password) return setError('Password is required.')
-    if (mode === 'signup' && !name.trim()) return setError('Name is required.')
+    // Fall back to DOM value — browser autofill fills the input visually
+    // but doesn't trigger onChange, leaving React state empty
+    const emailVal = (email || emailRef.current?.value || '').trim()
+    const passwordVal = password || passwordRef.current?.value || ''
+    const nameVal = (name || nameRef.current?.value || '').trim()
+
+    if (!emailVal) return setError('Email is required.')
+    if (!passwordVal) return setError('Password is required.')
+    if (mode === 'signup' && !nameVal) return setError('Name is required.')
 
     setBusy(true)
     try {
       let result
       if (mode === 'login') {
-        result = await api.authLogin(email.trim(), password)
+        result = await api.authLogin(emailVal, passwordVal)
       } else {
-        result = await api.authSignup(name.trim(), email.trim(), password)
+        result = await api.authSignup(nameVal, emailVal, passwordVal)
       }
       login(result.user, result.token)
       navigate(decodeURIComponent(redirectTo), { replace: true })
@@ -156,6 +163,7 @@ export default function UserSelectPage() {
                   type="email"
                   value={email}
                   onChange={e => { setEmail(e.target.value); setError('') }}
+                  onFocus={e => { if (!email && e.target.value) setEmail(e.target.value) }}
                   placeholder="you@example.com"
                   autoComplete="email"
                   style={inputStyle}
@@ -167,9 +175,11 @@ export default function UserSelectPage() {
               <div className="relative">
                 <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
                 <input
+                  ref={passwordRef}
                   type={showPass ? 'text' : 'password'}
                   value={password}
                   onChange={e => { setPassword(e.target.value); setError('') }}
+                  onFocus={e => { if (!password && e.target.value) setPassword(e.target.value) }}
                   placeholder="Password"
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   style={inputStyle}
