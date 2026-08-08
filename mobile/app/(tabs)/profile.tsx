@@ -1,17 +1,23 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { THEME_LIST } from '@/src/theme/themes';
 import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
+import { AppText } from '@/src/components/ui/AppText';
+import { Avatar } from '@/src/components/ui/Avatar';
+import { LogoMark } from '@/src/components/ui/Logo';
 import { APP_ENV, IS_DEV, apiUrlHint } from '@/src/config/env';
 import { useAuthActions } from '@/src/features/auth/useAuthActions';
+import * as Haptics from 'expo-haptics';
 
 export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
-  const { themeId, tokens: t, setTheme } = useThemeStore();
+  const { themeId, setTheme } = useThemeStore();
   const { busy, signOut } = useAuthActions();
+  const router = useRouter();
 
   const onLogout = () => {
     Alert.alert('Log out', 'Sign out of Split Striker Wise?', [
@@ -28,31 +34,57 @@ export default function ProfileScreen() {
 
   return (
     <Screen inTabs scroll>
-      <Text style={[styles.title, { color: t.text }]}>Profile</Text>
+      <View style={styles.titleRow}>
+        <AppText variant="display">Profile</AppText>
+        <LogoMark size="sm" />
+      </View>
 
-      <Card style={{ marginBottom: 16 }}>
+      <Card elevated="md" style={{ marginBottom: 16 }}>
         <View style={styles.userRow}>
-          <View style={[styles.avatar, { backgroundColor: t.brand500 }]}>
-            <Text style={{ color: '#fff', fontWeight: '800', fontSize: 20 }}>
-              {(user?.name || '?').slice(0, 1).toUpperCase()}
-            </Text>
-          </View>
+          <Avatar name={user?.name} seed={user?.id} size={56} avatarUrl={user?.avatar_url} />
           <View style={{ flex: 1 }}>
-            <Text style={{ color: t.text, fontWeight: '800', fontSize: 18 }}>{user?.name}</Text>
-            <Text style={{ color: t.textMuted }}>{user?.email}</Text>
+            <AppText variant="titleSm">{user?.name}</AppText>
+            <AppText muted variant="bodySm" style={{ marginTop: 2 }}>
+              {user?.email}
+            </AppText>
           </View>
         </View>
+        <Button
+          title="Edit profile"
+          variant="secondary"
+          style={{ marginTop: 14 }}
+          onPress={() => router.push('/profile/edit')}
+        />
       </Card>
 
-      <Text style={[styles.section, { color: t.text }]}>Theme</Text>
-      <Card style={{ marginBottom: 16 }}>
+      <AppText variant="titleSm" style={styles.section}>
+        Expenses
+      </AppText>
+      <Card elevated="sm" style={{ marginBottom: 16, gap: 10 }}>
+        <AppText muted variant="bodySm">
+          Review expenses that still need a category or other quick updates.
+        </AppText>
+        <Button
+          title="Review expenses"
+          variant="secondary"
+          onPress={() => router.push('/expenses/review')}
+        />
+      </Card>
+
+      <AppText variant="titleSm" style={styles.section}>
+        Theme
+      </AppText>
+      <Card elevated="sm" style={{ marginBottom: 16 }}>
         <View style={styles.swatches}>
           {THEME_LIST.map((theme) => {
             const active = theme.id === themeId;
             return (
               <Pressable
                 key={theme.id}
-                onPress={() => void setTheme(theme.id)}
+                onPress={() => {
+                  void Haptics.selectionAsync().catch(() => undefined);
+                  void setTheme(theme.id);
+                }}
                 accessibilityRole="button"
                 accessibilityLabel={`${theme.label} theme`}
                 accessibilityState={{ selected: active }}
@@ -66,7 +98,6 @@ export default function ProfileScreen() {
                     : { borderColor: 'transparent', opacity: 0.75 },
                 ]}
               >
-                {/* Approximate web conic-gradient(swatch | swatchB) */}
                 <View style={styles.swatchSplit}>
                   <View style={[styles.swatchHalf, { backgroundColor: theme.swatch }]} />
                   <View style={[styles.swatchHalf, { backgroundColor: theme.swatchB }]} />
@@ -76,17 +107,23 @@ export default function ProfileScreen() {
             );
           })}
         </View>
-        <Text style={{ color: t.textMuted, marginTop: 10 }}>
+        <AppText muted variant="caption" style={{ marginTop: 10 }}>
           {THEME_LIST.find((x) => x.id === themeId)?.label} theme
-        </Text>
+        </AppText>
       </Card>
 
       {IS_DEV || APP_ENV !== 'production' ? (
         <>
-          <Text style={[styles.section, { color: t.text }]}>Connection</Text>
-          <Card style={{ marginBottom: 16, gap: 6 }}>
-            <Text style={{ color: t.textMuted }}>Environment: {APP_ENV}</Text>
-            <Text style={{ color: t.textMuted }}>{apiUrlHint()}</Text>
+          <AppText variant="titleSm" style={styles.section}>
+            Connection
+          </AppText>
+          <Card elevated="sm" style={{ marginBottom: 16, gap: 6 }}>
+            <AppText muted variant="caption">
+              Environment: {APP_ENV}
+            </AppText>
+            <AppText muted variant="caption">
+              {apiUrlHint()}
+            </AppText>
           </Card>
         </>
       ) : null}
@@ -97,16 +134,14 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 28, fontWeight: '800', marginBottom: 16 },
-  section: { fontSize: 16, fontWeight: '700', marginBottom: 10 },
-  userRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  titleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
+  section: { marginBottom: 10 },
+  userRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   swatches: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', alignItems: 'center' },
   swatchOuter: {
     width: 28,

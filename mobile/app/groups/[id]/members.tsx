@@ -1,18 +1,19 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Alert, StyleSheet, Text, View } from 'react-native';
-import { addMember, getGroup, removeMember } from '@/src/api/groups';
+import { Alert, StyleSheet, View } from 'react-native';
+import { AppText } from '@/src/components/ui/AppText';
+import { fonts } from '@/src/theme/typography';
+import { getGroup, removeMember } from '@/src/api/groups';
 import { getBalances } from '@/src/api/balances';
-import { getUsers } from '@/src/api/users';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { Screen } from '@/src/components/ui/Screen';
-import { TextField } from '@/src/components/ui/TextField';
-import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
-import { ErrorView, LoadingView } from '@/src/components/ui/StateViews';
+import { ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
 import { MemberRow } from '@/src/components/groups/MemberRow';
+import { GroupInviteCard } from '@/src/components/groups/GroupInviteCard';
 import { formatGroupBalanceLabel } from '@/src/features/groups/balanceLabel';
 import { ApiError } from '@/src/types/api';
 
@@ -23,7 +24,6 @@ export default function GroupMembersScreen() {
   const t = useThemeStore((s) => s.tokens);
   const router = useRouter();
   const qc = useQueryClient();
-  const [search, setSearch] = useState('');
   const [removingId, setRemovingId] = useState<number | null>(null);
 
   const groupQuery = useQuery({
@@ -36,31 +36,12 @@ export default function GroupMembersScreen() {
     queryFn: () => getBalances(groupId),
     enabled: Number.isFinite(groupId),
   });
-  const usersQuery = useQuery({ queryKey: ['users'], queryFn: getUsers });
-
-  const memberIds = useMemo(
-    () => new Set((groupQuery.data?.members ?? []).map((m) => m.id)),
-    [groupQuery.data],
-  );
 
   const balanceByUser = useMemo(() => {
     const map = new Map<number, string>();
     for (const b of balancesQuery.data?.balances ?? []) map.set(b.user_id, b.balance);
     return map;
   }, [balancesQuery.data]);
-
-  const candidates = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return (usersQuery.data ?? [])
-      .filter((u) => !memberIds.has(u.id))
-      .filter((u) => {
-        if (!q) return true;
-        return (
-          u.name.toLowerCase().includes(q) ||
-          (u.email || '').toLowerCase().includes(q)
-        );
-      });
-  }, [usersQuery.data, memberIds, search]);
 
   const invalidate = async () => {
     await Promise.all([
@@ -71,16 +52,6 @@ export default function GroupMembersScreen() {
       qc.invalidateQueries({ queryKey: ['group-activity', groupId] }),
     ]);
   };
-
-  const addMutation = useMutation({
-    mutationFn: (userId: number) => addMember(groupId, userId),
-    onSuccess: async () => {
-      setSearch('');
-      await invalidate();
-    },
-    onError: (e) =>
-      Alert.alert('Could not add member', e instanceof ApiError ? e.detail : String(e)),
-  });
 
   const removeMutation = useMutation({
     mutationFn: (userId: number) => removeMember(groupId, userId),
@@ -113,8 +84,14 @@ export default function GroupMembersScreen() {
     );
   };
 
-  if (groupQuery.isLoading) return <LoadingView />;
-  if (groupQuery.isError || !groupQuery.data) {
+  if (groupQuery.isLoading) {
+    return (
+      <Screen withHeader>
+        <ListSkeleton rows={4} />
+      </Screen>
+    );
+  }
+  if (groupQuery.isError || !groupQuery.data || !user) {
     return (
       <ErrorView
         message={
@@ -128,7 +105,7 @@ export default function GroupMembersScreen() {
   }
 
   const group = groupQuery.data;
-  const isOwner = group.created_by_id === user?.id;
+  const isOwner = group.created_by_id === user.id;
   const currency = group.currency;
 
   return (
@@ -137,26 +114,24 @@ export default function GroupMembersScreen() {
       <Screen
         withHeader
         scroll
-        keyboard
         refreshing={groupQuery.isRefetching}
         onRefresh={() => {
           void groupQuery.refetch();
           void balancesQuery.refetch();
         }}
       >
-        <Text style={[styles.heading, { color: t.text }]}>
+        <AppText style={[styles.heading, { color: t.text }]}>
           {group.members.length} member{group.members.length === 1 ? '' : 's'}
-        </Text>
+        </AppText>
 
         <View style={{ gap: 10, marginBottom: 20 }}>
           {group.members.map((m) => {
             const bal = balanceByUser.get(m.id);
             const n = bal != null ? Number(bal) : 0;
-            const isYou = m.id === user?.id;
+            const isYou = m.id === user.id;
             const canRemove =
               !group.archived &&
               (isYou || isOwner) &&
-              // Owner deleting themselves is leave; don't allow removing owner via others
               !(m.id === group.created_by_id && !isYou);
 
             return (
@@ -184,53 +159,12 @@ export default function GroupMembersScreen() {
         </View>
 
         {!group.archived ? (
-          <>
-            <Text style={[styles.heading, { color: t.text }]}>Add member</Text>
-            <Text style={{ color: t.textMuted, marginBottom: 10 }}>
-              Pick an existing user. Or share an invite link from Settings.
-            </Text>
-            <TextField
-              label="Search users"
-              value={search}
-              onChangeText={setSearch}
-              placeholder="Name or email"
-              autoCapitalize="none"
-            />
-            <View style={{ gap: 8, marginTop: 12 }}>
-              {usersQuery.isLoading ? (
-                <LoadingView label="Loading users…" />
-              ) : candidates.length === 0 ? (
-                <Card>
-                  <Text style={{ color: t.textMuted }}>
-                    No matching users to add. Try an invite link from Settings.
-                  </Text>
-                  <Button
-                    title="Open settings"
-                    variant="secondary"
-                    style={{ marginTop: 12 }}
-                    onPress={() => router.push(`/groups/${groupId}/settings`)}
-                  />
-                </Card>
-              ) : (
-                candidates.slice(0, 20).map((u) => (
-                  <MemberRow
-                    key={u.id}
-                    user={u}
-                    actionLabel="Add"
-                    actionTone="brand"
-                    actionIcon="person-add-outline"
-                    actionPending={addMutation.isPending && addMutation.variables === u.id}
-                    onAction={() => addMutation.mutate(u.id)}
-                  />
-                ))
-              )}
-            </View>
-          </>
+          <GroupInviteCard groupId={groupId} actorUserId={user.id} />
         ) : (
           <Card>
-            <Text style={{ color: t.textMuted }}>
-              This group is archived. Unarchive it in Settings before changing members.
-            </Text>
+            <AppText style={{ color: t.textMuted }}>
+              This group is archived. Unarchive it in Settings before inviting new members.
+            </AppText>
           </Card>
         )}
       </Screen>
@@ -239,5 +173,5 @@ export default function GroupMembersScreen() {
 }
 
 const styles = StyleSheet.create({
-  heading: { fontSize: 18, fontWeight: '800', marginBottom: 8 },
+  heading: { fontSize: 18, fontFamily: fonts.extrabold, marginBottom: 8 },
 });

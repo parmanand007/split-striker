@@ -1,42 +1,37 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useThemeStore } from '@/src/stores/themeStore';
-
-function Bone({ height, width, style }: { height: number; width?: number | `${number}%`; style?: object }) {
-  const t = useThemeStore((s) => s.tokens);
-  return (
-    <View
-      style={[
-        {
-          height,
-          width: width ?? '100%',
-          borderRadius: 12,
-          backgroundColor: t.brand50,
-          opacity: 0.85,
-        },
-        style,
-      ]}
-    />
-  );
-}
+import { StyleSheet, View } from 'react-native';
+import { ShimmerBone } from '@/src/components/ui/Shimmer';
 
 export function HomeSkeleton() {
-  const t = useThemeStore((s) => s.tokens);
   return (
     <View style={styles.wrap} accessibilityLabel="Loading home">
-      <Text style={{ color: t.textMuted, fontWeight: '600', marginBottom: 8 }}>Loading home…</Text>
-      <Bone height={14} width="40%" />
-      <Bone height={28} width="70%" style={{ marginTop: 8 }} />
-      <View style={styles.row}>
-        <Bone height={88} style={{ flex: 1, borderRadius: 16 }} />
-        <Bone height={88} style={{ flex: 1, borderRadius: 16 }} />
+      <View style={styles.header}>
+        <ShimmerBone height={44} width={44} radius={14} />
+        <View style={{ flex: 1, gap: 8 }}>
+          <ShimmerBone height={12} width="40%" radius={8} />
+          <ShimmerBone height={22} width="65%" radius={8} />
+        </View>
+        <ShimmerBone height={54} width={96} radius={14} />
       </View>
-      <Bone height={64} style={{ marginTop: 8, borderRadius: 14 }} />
-      <Bone height={120} style={{ marginTop: 12, borderRadius: 16 }} />
+      <View style={styles.row}>
+        <ShimmerBone height={96} radius={18} style={{ flex: 1 }} />
+        <ShimmerBone height={96} radius={18} style={{ flex: 1 }} />
+      </View>
+      <View style={styles.actions}>
+        {[0, 1, 2, 3].map((i) => (
+          <ShimmerBone key={i} height={68} radius={14} style={{ flex: 1 }} />
+        ))}
+      </View>
+      <ShimmerBone height={18} width="30%" radius={8} style={{ marginTop: 8 }} />
+      <ShimmerBone height={140} radius={18} style={{ marginTop: 10 }} />
+      <ShimmerBone height={18} width="40%" radius={8} style={{ marginTop: 16 }} />
+      <ShimmerBone height={100} radius={18} style={{ marginTop: 10 }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { paddingHorizontal: 4, paddingTop: 4, gap: 4 },
-  row: { flexDirection: 'row', gap: 8, marginTop: 12 },
+  wrap: { paddingHorizontal: 2, paddingTop: 4 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  row: { flexDirection: 'row', gap: 10, marginTop: 14 },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
 });

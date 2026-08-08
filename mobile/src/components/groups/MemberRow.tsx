@@ -1,8 +1,10 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { User } from '@/src/types/api';
 import { useThemeStore } from '@/src/stores/themeStore';
-import { groupColor } from '@/src/features/groups/constants';
+import { Avatar } from '@/src/components/ui/Avatar';
+import { AppText } from '@/src/components/ui/AppText';
+import { shadow, space } from '@/src/theme/tokens';
 
 interface Props {
   user: User;
@@ -42,30 +44,33 @@ export function MemberRow({
     <View
       style={[
         styles.row,
+        shadow('sm'),
         { borderColor: t.cardBorder, backgroundColor: t.cardBg },
       ]}
     >
-      <View style={[styles.avatar, { backgroundColor: groupColor(user.id) }]}>
-        <Text style={styles.avatarText}>{user.name.slice(0, 1).toUpperCase()}</Text>
-      </View>
+      <Avatar name={user.name} seed={user.id} size={42} avatarUrl={user.avatar_url} />
       <View style={{ flex: 1 }}>
-        <Text style={[styles.name, { color: t.text }]} numberOfLines={1}>
+        <AppText variant="body" style={{ fontWeight: '700' }} numberOfLines={1}>
           {user.name}
           {isYou ? ' (you)' : ''}
-        </Text>
-        <Text style={{ color: t.textMuted, fontSize: 12 }} numberOfLines={1}>
+        </AppText>
+        <AppText muted variant="caption" numberOfLines={1} style={{ marginTop: 2 }}>
           {user.email || 'No email'}
           {isOwner ? ' · owner' : ''}
-        </Text>
+        </AppText>
       </View>
       {balanceLabel ? (
-        <Text style={{ color: toneColor, fontWeight: '700', marginRight: 8 }}>{balanceLabel}</Text>
+        <AppText style={{ color: toneColor, fontWeight: '700', marginRight: 8 }} variant="caption">
+          {balanceLabel}
+        </AppText>
       ) : null}
       {onAction ? (
         <Pressable
           onPress={onAction}
           disabled={actionPending}
           hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={actionLabel}
           style={styles.removeBtn}
         >
           {actionPending ? (
@@ -73,9 +78,9 @@ export function MemberRow({
           ) : (
             <>
               <Ionicons name={actionIcon} size={16} color={actionColor} />
-              <Text style={{ color: actionColor, fontSize: 12, fontWeight: '700' }}>
+              <AppText style={{ color: actionColor, fontWeight: '700' }} variant="caption">
                 {actionLabel}
-              </Text>
+              </AppText>
             </>
           )}
         </Pressable>
@@ -88,20 +93,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    minHeight: 64,
+    gap: space.md,
+    padding: space.lg,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    minHeight: 68,
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { color: '#fff', fontWeight: '800', fontSize: 15 },
-  name: { fontSize: 15, fontWeight: '700' },
   removeBtn: { alignItems: 'center', gap: 2, minWidth: 52 },
 });

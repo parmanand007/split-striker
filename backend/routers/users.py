@@ -1,16 +1,19 @@
 from collections import defaultdict
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from database import get_db
 from dependencies import get_current_user
 from models import User, Group, Expense, Payment
-from schemas import UserCreate, UserOut, UserSummary, LoginByEmail
+from schemas import UserCreate, UserOut, UserUpdate, UserSummary, LoginByEmail
 from services.balance_calculator import compute_net_balances
+from services import avatar_storage
 
 router = APIRouter(prefix="/api/users", tags=["users"], dependencies=[Depends(get_current_user)])
 
@@ -63,6 +66,111 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(404, "User not found.")
+    return user
+
+
+@router.put("/{user_id}", response_model=UserOut)
+def update_user(
+    user_id: int,
+    body: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update the authenticated user's own profile only."""
+    _assert_self(user_id, current_user)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found.")
+
+    if body.name is not None:
+        name = body.name.strip()
+        if not name:
+            raise HTTPException(400, "Name is required.")
+        if len(name) > 100:
+            raise HTTPException(400, "Name is too long.")
+        user.name = name
+
+    if body.email is not None:
+        email = body.email.strip().lower()
+        if not email:
+            raise HTTPException(400, "Email is required.")
+        if "@" not in email or "." not in email.split("@")[-1]:
+            raise HTTPException(400, "Enter a valid email.")
+        existing = (
+            db.query(User)
+            .filter(User.email == email, User.id != user_id)
+            .first()
+        )
+        if existing:
+            raise HTTPException(400, "An account with this email already exists.")
+        user.email = email
+
+    if body.avatar_color is not None:
+        color = body.avatar_color.strip()
+        user.avatar_color = color or None
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def _assert_self(user_id: int, current_user: Optional[User]) -> None:
+    if current_user is not None and current_user.id != user_id:
+        raise HTTPException(403, "You can only update your own profile.")
+
+
+@router.get("/{user_id}/avatar")
+def get_user_avatar(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or user.avatar_updated_at is None or not avatar_storage.avatar_exists(user_id):
+        raise HTTPException(404, "Avatar not found.")
+    path = avatar_storage.avatar_path(user_id)
+    return FileResponse(
+        path,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
+
+
+@router.post("/{user_id}/avatar", response_model=UserOut)
+async def upload_user_avatar(
+    user_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    _assert_self(user_id, current_user)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found.")
+
+    raw = await file.read()
+    try:
+        avatar_storage.save_avatar(user_id, raw, file.content_type)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+    user.avatar_updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.delete("/{user_id}/avatar", response_model=UserOut)
+def delete_user_avatar(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    _assert_self(user_id, current_user)
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found.")
+
+    avatar_storage.delete_avatar(user_id)
+    user.avatar_updated_at = None
+    db.commit()
+    db.refresh(user)
     return user
 
 

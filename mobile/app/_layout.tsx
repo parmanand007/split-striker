@@ -161,6 +161,14 @@ export default function RootLayout() {
             name="expenses/edit"
             options={{ presentation: 'modal', headerShown: true, title: 'Edit expense' }}
           />
+          <Stack.Screen
+            name="expenses/review"
+            options={{ headerShown: true, title: 'Review expenses' }}
+          />
+          <Stack.Screen
+            name="profile/edit"
+            options={{ presentation: 'modal', headerShown: true, title: 'Edit profile' }}
+          />
         </Stack>
       </AuthGate>
     </QueryClientProvider>

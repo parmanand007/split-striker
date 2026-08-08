@@ -1,18 +1,22 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getGroups } from '@/src/api/groups';
 import { getUserSummary } from '@/src/api/users';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { Screen } from '@/src/components/ui/Screen';
+import { AppText } from '@/src/components/ui/AppText';
 import { EmptyView, ErrorView } from '@/src/components/ui/StateViews';
 import { GroupRow } from '@/src/components/groups/GroupRow';
 import { GroupListSkeleton } from '@/src/components/groups/GroupSkeleton';
 import { formatGroupBalanceLabel } from '@/src/features/groups/balanceLabel';
 import { ApiError } from '@/src/types/api';
+import { shadow, space } from '@/src/theme/tokens';
+import * as Haptics from 'expo-haptics';
 
 export default function GroupsScreen() {
   const t = useThemeStore((s) => s.tokens);
@@ -75,23 +79,35 @@ export default function GroupsScreen() {
       }}
     >
       <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: t.text }]}>Groups</Text>
-          <Text style={{ color: t.textMuted, marginTop: 2 }}>
+        <View style={{ flex: 1 }}>
+          <AppText variant="display">Groups</AppText>
+          <AppText muted variant="bodySm" style={{ marginTop: 2 }}>
             {groups.length} group{groups.length === 1 ? '' : 's'}
-          </Text>
+          </AppText>
         </View>
         <Pressable
-          onPress={() => router.push('/groups/create')}
-          style={[styles.addBtn, { backgroundColor: t.brand500 }]}
+          onPress={() => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+            router.push('/groups/create');
+          }}
+          style={[styles.addBtn, shadow('glow')]}
           accessibilityLabel="Create group"
+          accessibilityRole="button"
         >
-          <Ionicons name="add" size={22} color={t.btnPrimaryText} />
+          <LinearGradient
+            colors={[t.brand400, t.brand600]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.addGrad}
+          >
+            <Ionicons name="add" size={22} color={t.btnPrimaryText} />
+          </LinearGradient>
         </Pressable>
       </View>
 
       {groups.length === 0 ? (
         <EmptyView
+          icon="people-outline"
           title="No groups yet"
           message="Create a group for a trip, flat, or shared bill."
           actionLabel="Create group"
@@ -116,7 +132,9 @@ export default function GroupsScreen() {
 
           {archived.length > 0 ? (
             <>
-              <Text style={[styles.section, { color: t.textMuted }]}>Archived</Text>
+              <AppText muted variant="overline" style={styles.section}>
+                Archived
+              </AppText>
               {archived.map((g) => (
                 <GroupRow
                   key={g.id}
@@ -138,22 +156,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: space.lg,
+    gap: space.md,
   },
-  title: { fontSize: 28, fontWeight: '800' },
   addBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  addGrad: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   section: {
-    marginTop: 16,
-    marginBottom: 4,
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    marginTop: space.lg,
+    marginBottom: space.xs,
   },
 });

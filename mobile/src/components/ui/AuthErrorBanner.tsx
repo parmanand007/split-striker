@@ -1,5 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { MARKETING } from '@/src/theme/themes';
+import { fonts } from '@/src/theme/typography';
+import { AppText } from './AppText';
 
 export function AuthErrorBanner({
   message,
@@ -13,7 +15,7 @@ export function AuthErrorBanner({
     <View style={styles.banner} accessibilityRole="alert">
       <View style={styles.row}>
         <View style={styles.dot} />
-        <Text style={styles.text}>{message}</Text>
+        <AppText style={styles.text}>{message}</AppText>
       </View>
       {onDismiss ? (
         <Pressable
@@ -23,7 +25,7 @@ export function AuthErrorBanner({
           hitSlop={8}
           style={styles.dismiss}
         >
-          <Text style={styles.dismissText}>Dismiss</Text>
+          <AppText style={styles.dismissText}>Dismiss</AppText>
         </Pressable>
       ) : null}
     </View>
@@ -52,10 +54,10 @@ const styles = StyleSheet.create({
   text: {
     color: MARKETING.negative,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     lineHeight: 18,
     flex: 1,
   },
   dismiss: { minHeight: 32, justifyContent: 'center' },
-  dismissText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  dismissText: { color: '#fff', fontFamily: fonts.bold, fontSize: 13 },
 });

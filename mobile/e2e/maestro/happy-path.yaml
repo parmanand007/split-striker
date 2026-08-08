@@ -1,13 +1,13 @@
 # UI E2E (iOS Simulator + Maestro).
-# 1) Keep Metro on LAN: REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.14 npx expo start --lan
-# 2) Seed user: node scripts/e2e-seed-user.mjs
-# 3) Replace SEED_EMAIL below, then:
-#    maestro --device <UDID> test e2e/maestro/happy-path.yaml
+# Prerequisites:
+#   Metro running; backend on :8000
+#   Seed: node scripts/e2e-seed-user.mjs  → paste email below
+#   maestro --device <UDID> test e2e/maestro/happy-path.yaml
 appId: com.splitstriker.app
 ---
 - launchApp:
     clearState: true
-- openLink: exp+split-striker://expo-development-client/?url=http://192.168.1.14:8081
+- openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
 - extendedWaitUntil:
     visible: "Continue"
     timeout: 90000
@@ -21,7 +21,7 @@ appId: com.splitstriker.app
     when:
       visible: "Enter URL manually"
     commands:
-      - openLink: exp+split-striker://expo-development-client/?url=http://192.168.1.14:8081
+      - openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
 - extendedWaitUntil:
     visible: ".*friendships.*"
     timeout: 90000
@@ -40,7 +40,6 @@ appId: com.splitstriker.app
 - tapOn:
     id: "login-password"
 - inputText: "testpass123"
-- tapOn: "Sign in to your account."
 - tapOn:
     id: "login-submit"
 - runFlow:
@@ -49,16 +48,22 @@ appId: com.splitstriker.app
     commands:
       - tapOn: "Not Now"
 - extendedWaitUntil:
-    visible: "YOU ARE OWED"
+    visible:
+      id: "home-user-name"
     timeout: 45000
-- assertVisible: "YOU ARE OWED"
+- assertVisible:
+    id: "home-user-name"
+- assertVisible: "You are owed"
 - assertVisible: "E2E iOS User"
 - tapOn:
     id: "home-create-group"
+- extendedWaitUntil:
+    visible:
+      id: "group-name"
+    timeout: 15000
 - tapOn:
     id: "group-name"
 - inputText: "Goa Trip E2E"
-- tapOn: "Currency"
 - scrollUntilVisible:
     element:
       id: "group-create-submit"
@@ -70,3 +75,4 @@ appId: com.splitstriker.app
     visible: "Goa Trip E2E"
     timeout: 20000
 - assertVisible: "Goa Trip E2E"
+- assertVisible: "Trip budget"

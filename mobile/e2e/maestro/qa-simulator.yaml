@@ -1,0 +1,89 @@
+# Simulator QA — login, home, group create, trip budget card
+appId: com.splitstriker.app
+---
+- launchApp:
+    clearState: true
+- openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 90000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Reload"
+    commands:
+      - tapOn: "Go home"
+- runFlow:
+    when:
+      visible: "Enter URL manually"
+    commands:
+      - openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
+- extendedWaitUntil:
+    visible: ".*friendships.*"
+    timeout: 90000
+- scrollUntilVisible:
+    element:
+      id: "welcome-login"
+    direction: DOWN
+    timeout: 25000
+    visibilityPercentage: 30
+    centerElement: true
+- tapOn:
+    id: "welcome-login"
+- tapOn:
+    id: "login-email"
+- inputText: "e2e_ui_1786219758079@test.com"
+- tapOn:
+    id: "login-password"
+- inputText: "testpass123"
+- tapOn:
+    id: "login-submit"
+- hideKeyboard
+- runFlow:
+    when:
+      visible: "Save Password?"
+    commands:
+      - tapOn: "Not Now"
+- extendedWaitUntil:
+    visible: "E2E iOS User"
+    timeout: 120000
+- assertVisible: "E2E iOS User"
+- assertVisible: "Net balance"
+- tapOn:
+    id: "home-create-group"
+- extendedWaitUntil:
+    visible:
+      id: "group-name"
+    timeout: 15000
+- tapOn:
+    id: "group-name"
+- inputText: "Simulator QA Trip"
+- scrollUntilVisible:
+    element:
+      id: "group-create-submit"
+    direction: DOWN
+    visibilityPercentage: 40
+- tapOn:
+    id: "group-create-submit"
+- extendedWaitUntil:
+    visible: "Simulator QA Trip"
+    timeout: 25000
+- assertVisible: "Simulator QA Trip"
+- tapOn: "Profile"
+- extendedWaitUntil:
+    visible: "Edit profile"
+    timeout: 15000
+- assertVisible: "Edit profile"
+- tapOn: "Edit profile"
+- extendedWaitUntil:
+    visible: "Save"
+    timeout: 15000
+- tapOn: "Save"
+- extendedWaitUntil:
+    visible: "Profile"
+    timeout: 15000
+- tapOn: "Home"
+- extendedWaitUntil:
+    visible:
+      id: "home-user-name"
+    timeout: 15000

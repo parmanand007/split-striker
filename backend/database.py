@@ -43,6 +43,9 @@ def run_migrations():
         "ALTER TABLE users ADD COLUMN avatar_color TEXT",
         "ALTER TABLE expenses ADD COLUMN notes TEXT",
         "ALTER TABLE users ADD COLUMN password_hash TEXT",
+        "ALTER TABLE groups ADD COLUMN budget NUMERIC(14, 2)",
+        "ALTER TABLE groups ADD COLUMN category_budgets JSON",
+        "ALTER TABLE users ADD COLUMN avatar_updated_at DATETIME",
     ]
     with engine.connect() as conn:
         for sql in migrations:

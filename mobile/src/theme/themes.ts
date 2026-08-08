@@ -54,7 +54,7 @@ const base = {
   danger: '#e11d48',
   inputBg: '#ffffff',
   overlay: 'rgba(0,0,0,0.50)',
-  btnPrimaryText: '#000000',
+  btnPrimaryText: '#ffffff',
   radiusSm: 12, // xl
   radiusMd: 16, // 2xl — cards / buttons
   radiusLg: 20,

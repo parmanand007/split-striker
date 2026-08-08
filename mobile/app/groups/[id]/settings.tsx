@@ -6,7 +6,9 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, StyleSheet, Switch, View } from 'react-native';
+import { AppText } from '@/src/components/ui/AppText';
+import { fonts } from '@/src/theme/typography';
 import {
   createInvite,
   deleteGroup,
@@ -22,12 +24,21 @@ import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
 import { TextField } from '@/src/components/ui/TextField';
 import { Button } from '@/src/components/ui/Button';
-import { ErrorView, LoadingView } from '@/src/components/ui/StateViews';
+import { ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
+import { EXPENSE_CATEGORIES } from '@/src/features/expenses/constants';
 import { ApiError } from '@/src/types/api';
 
 const settingsSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(200),
   emoji: z.string().max(10).optional(),
+  budget: z
+    .string()
+    .optional()
+    .refine(
+      (v) => !v || v.trim() === '' || (Number.isFinite(Number(v)) && Number(v) >= 0),
+      'Enter a valid non-negative budget',
+    ),
 });
 
 type SettingsForm = z.infer<typeof settingsSchema>;
@@ -58,9 +69,14 @@ export default function GroupSettingsScreen() {
   const [simplifyOverride, setSimplifyOverride] = useState<boolean | null>(null);
   const [confirmDelete, setConfirmDelete] = useState('');
   const [inviteLink, setInviteLink] = useState<string | null>(null);
+  /** null = use server values; object = local draft while editing */
+  const [categoryBudgetDraft, setCategoryBudgetDraft] = useState<Record<string, string> | null>(
+    null,
+  );
 
   const archived = archivedOverride ?? groupQuery.data?.archived ?? false;
   const simplify = simplifyOverride ?? groupQuery.data?.simplify_debts ?? true;
+  const categoryBudgets = categoryBudgetDraft ?? groupQuery.data?.category_budgets ?? {};
 
   const {
     control,
@@ -68,11 +84,12 @@ export default function GroupSettingsScreen() {
     formState: { errors, isDirty },
   } = useForm<SettingsForm>({
     resolver: zodResolver(settingsSchema),
-    defaultValues: { name: '', emoji: '' },
+    defaultValues: { name: '', emoji: '', budget: '' },
     values: groupQuery.data
       ? {
           name: groupQuery.data.name,
           emoji: groupQuery.data.emoji || '',
+          budget: groupQuery.data.budget != null ? String(groupQuery.data.budget) : '',
         }
       : undefined,
   });
@@ -92,18 +109,40 @@ export default function GroupSettingsScreen() {
   };
 
   const saveMutation = useMutation({
-    mutationFn: (values: SettingsForm) =>
-      updateGroup(groupId, {
+    mutationFn: (values: SettingsForm) => {
+      const budgetTrim = values.budget?.trim() ?? '';
+      const cleanedCats: Record<string, string> = {};
+      for (const [k, v] of Object.entries(categoryBudgets)) {
+        const t = v.trim();
+        if (!t) continue;
+        if (!Number.isFinite(Number(t)) || Number(t) < 0) {
+          throw new Error(`Invalid category budget for ${k}`);
+        }
+        cleanedCats[k] = t;
+      }
+      return updateGroup(groupId, {
         name: values.name.trim(),
         emoji: values.emoji?.trim() || null,
         archived,
         simplify_debts: simplify,
-      }),
+        ...(budgetTrim
+          ? { budget: budgetTrim, clear_budget: false }
+          : { clear_budget: true }),
+        ...(Object.keys(cleanedCats).length
+          ? { category_budgets: cleanedCats, clear_category_budgets: false }
+          : { clear_category_budgets: true }),
+      });
+    },
     onSuccess: async () => {
+      setCategoryBudgetDraft(null);
       await invalidate();
       Alert.alert('Saved', 'Group settings updated.');
     },
-    onError: (e) => Alert.alert('Save failed', e instanceof ApiError ? e.detail : String(e)),
+    onError: (e) =>
+      Alert.alert(
+        'Save failed',
+        e instanceof ApiError ? e.detail : e instanceof Error ? e.message : String(e),
+      ),
   });
 
   const inviteMutation = useMutation({
@@ -153,7 +192,13 @@ export default function GroupSettingsScreen() {
       ),
   });
 
-  if (groupQuery.isLoading) return <LoadingView />;
+  if (groupQuery.isLoading) {
+    return (
+      <Screen withHeader>
+        <ListSkeleton rows={4} />
+      </Screen>
+    );
+  }
   if (groupQuery.isError || !groupQuery.data) {
     return (
       <ErrorView
@@ -202,13 +247,57 @@ export default function GroupSettingsScreen() {
           )}
         />
 
-        <Card style={{ marginTop: 16, gap: 14 }}>
+        <View style={{ height: 12 }} />
+        <Controller
+          control={control}
+          name="budget"
+          render={({ field: { onChange, value } }) => (
+            <TextField
+              label={`Trip budget (${groupQuery.data?.currency || 'INR'}) — optional`}
+              value={value || ''}
+              onChangeText={onChange}
+              keyboardType="decimal-pad"
+              placeholder="e.g. 50000"
+              error={errors.budget?.message}
+              editable={!!isOwner}
+            />
+          )}
+        />
+        <AppText muted variant="caption" style={{ marginTop: 6 }}>
+          Leave blank to clear the budget. Spent totals use existing group expenses.
+        </AppText>
+
+        {isOwner ? (
+          <Card elevated="sm" style={{ marginTop: 16, gap: 10 }}>
+            <AppText style={{ fontFamily: fonts.bold }}>Optional category budgets</AppText>
+            <AppText muted variant="caption">
+              Track planned spend per category. Leave blank to skip.
+            </AppText>
+            {EXPENSE_CATEGORIES.map((cat) => (
+              <TextField
+                key={cat}
+                label={cat}
+                value={categoryBudgets[cat] || ''}
+                onChangeText={(text) =>
+                  setCategoryBudgetDraft((prev) => ({
+                    ...(prev ?? groupQuery.data?.category_budgets ?? {}),
+                    [cat]: text,
+                  }))
+                }
+                keyboardType="decimal-pad"
+                placeholder="Optional"
+              />
+            ))}
+          </Card>
+        ) : null}
+
+        <Card elevated="sm" style={{ marginTop: 16, gap: 14 }}>
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: t.text, fontWeight: '600' }}>Archived</Text>
-              <Text style={{ color: t.textMuted, fontSize: 12 }}>
+              <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>Archived</AppText>
+              <AppText style={{ color: t.textMuted, fontSize: 12 }}>
                 Blocks new expenses and members
-              </Text>
+              </AppText>
             </View>
             <Switch
               value={archived}
@@ -219,10 +308,10 @@ export default function GroupSettingsScreen() {
           </View>
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: t.text, fontWeight: '600' }}>Simplify debts</Text>
-              <Text style={{ color: t.textMuted, fontSize: 12 }}>
+              <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>Simplify debts</AppText>
+              <AppText style={{ color: t.textMuted, fontSize: 12 }}>
                 Fewer suggested settlement transfers
-              </Text>
+              </AppText>
             </View>
             <Switch
               value={simplify}
@@ -242,16 +331,16 @@ export default function GroupSettingsScreen() {
             onPress={handleSubmit((v) => saveMutation.mutate(v))}
           />
         ) : (
-          <Text style={{ color: t.textMuted, marginTop: 12 }}>
+          <AppText style={{ color: t.textMuted, marginTop: 12 }}>
             Only the group owner can edit these settings.
-          </Text>
+          </AppText>
         )}
 
-        <Text style={[styles.section, { color: t.text }]}>Members</Text>
-        <Card style={{ gap: 8 }}>
-          <Text style={{ color: t.textMuted }}>
+        <AppText style={[styles.section, { color: t.text }]}>Members</AppText>
+        <Card elevated="sm" style={{ gap: 8 }}>
+          <AppText style={{ color: t.textMuted }}>
             {group.members.length} member{group.members.length === 1 ? '' : 's'}
-          </Text>
+          </AppText>
           <Button
             title="Manage members"
             variant="secondary"
@@ -259,7 +348,7 @@ export default function GroupSettingsScreen() {
           />
         </Card>
 
-        <Text style={[styles.section, { color: t.text }]}>Invite</Text>
+        <AppText style={[styles.section, { color: t.text }]}>Invite</AppText>
         <Button
           title={inviteLink ? 'Copy invite link again' : 'Generate invite link'}
           variant="secondary"
@@ -267,30 +356,30 @@ export default function GroupSettingsScreen() {
           onPress={() => inviteMutation.mutate()}
         />
         {inviteLink ? (
-          <Text style={{ color: t.textMuted, marginTop: 8 }} selectable>
+          <AppText style={{ color: t.textMuted, marginTop: 8 }} selectable>
             {inviteLink}
-          </Text>
+          </AppText>
         ) : null}
 
         {isOwner && pendingRequests.length > 0 ? (
           <>
-            <Text style={[styles.section, { color: t.text }]}>Edit requests</Text>
+            <AppText style={[styles.section, { color: t.text }]}>Edit requests</AppText>
             {pendingRequests.map((er) => (
               <Card key={er.id} style={{ marginBottom: 10, gap: 8 }}>
-                <Text style={{ color: t.text, fontWeight: '600' }}>
+                <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>
                   {er.expense_description || `Expense #${er.expense_id}`}
-                </Text>
-                <Text style={{ color: t.textMuted, fontSize: 12 }}>
+                </AppText>
+                <AppText style={{ color: t.textMuted, fontSize: 12 }}>
                   Requested by {er.requested_by_name || `user ${er.requested_by_id}`}
-                </Text>
+                </AppText>
                 {er.message ? (
-                  <Text style={{ color: t.textMuted }}>{er.message}</Text>
+                  <AppText style={{ color: t.textMuted }}>{er.message}</AppText>
                 ) : null}
                 <View style={{ gap: 4 }}>
                   {Object.entries(er.proposed_changes || {}).map(([key, value]) => (
-                    <Text key={key} style={{ color: t.textMuted, fontSize: 12 }}>
+                    <AppText key={key} style={{ color: t.textMuted, fontSize: 12 }}>
                       {key}: {String(value)}
-                    </Text>
+                    </AppText>
                   ))}
                 </View>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -319,10 +408,10 @@ export default function GroupSettingsScreen() {
 
         {!isOwner ? (
           <>
-            <Text style={[styles.section, { color: t.text }]}>Leave group</Text>
-            <Text style={{ color: t.textMuted, marginBottom: 10 }}>
+            <AppText style={[styles.section, { color: t.text }]}>Leave group</AppText>
+            <AppText style={{ color: t.textMuted, marginBottom: 10 }}>
               You can leave only if your balance is settled (API-enforced).
-            </Text>
+            </AppText>
             <Button
               title="Leave group"
               variant="danger"
@@ -341,10 +430,10 @@ export default function GroupSettingsScreen() {
           </>
         ) : (
           <>
-            <Text style={[styles.section, { color: t.danger }]}>Delete group</Text>
-            <Text style={{ color: t.textMuted, marginBottom: 10 }}>
+            <AppText style={[styles.section, { color: t.danger }]}>Delete group</AppText>
+            <AppText style={{ color: t.textMuted, marginBottom: 10 }}>
               Only the owner can delete. This permanently removes the group.
-            </Text>
+            </AppText>
             <TextField
               label={`Type "${group.name}" to confirm`}
               value={confirmDelete}
@@ -376,5 +465,5 @@ export default function GroupSettingsScreen() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
-  section: { fontSize: 16, fontWeight: '700', marginTop: 24, marginBottom: 10 },
+  section: { fontSize: 16, fontFamily: fonts.bold, marginTop: 24, marginBottom: 10 },
 });

@@ -8,6 +8,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeStore } from '@/src/stores/themeStore';
 
@@ -85,6 +86,12 @@ export function Screen({
 
   return (
     <SafeAreaView style={[styles.fill, { backgroundColor: t.pageBg }]} edges={resolvedEdges}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[t.brand50, t.pageBg, t.pageBg]}
+        locations={[0, 0.22, 1]}
+        style={StyleSheet.absoluteFill}
+      />
       {content}
     </SafeAreaView>
   );
@@ -92,6 +99,5 @@ export function Screen({
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  // Tighter padding — large gaps on iPhone came from 16 + card 20 + section margins.
-  scroll: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24 },
+  scroll: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 28 },
 });

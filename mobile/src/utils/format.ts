@@ -1,4 +1,10 @@
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import {
+  format,
+  formatDistanceToNow,
+  isToday,
+  isYesterday,
+  parseISO,
+} from 'date-fns';
 
 export function formatMoney(amount: string | number, currency = 'INR'): string {
   const n = typeof amount === 'number' ? amount : Number(amount);
@@ -22,19 +28,56 @@ export function formatSignedMoney(amount: string | number, currency = 'INR'): st
   return formatMoney(0, currency);
 }
 
+/** Parse backend ISO timestamps into a local Date (device timezone). */
+export function parseLocalDate(iso: string): Date {
+  // Backend often stores naive UTC (`2026-08-08T18:30:00` without Z).
+  // Treat missing timezone as UTC so device-local conversion is correct.
+  const trimmed = iso.trim();
+  const hasZone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(trimmed);
+  const normalized = hasZone ? trimmed : `${trimmed}Z`;
+  return parseISO(normalized);
+}
+
 export function relativeTime(iso: string): string {
   try {
-    return formatDistanceToNow(parseISO(iso), { addSuffix: true });
+    return formatDistanceToNow(parseLocalDate(iso), { addSuffix: true });
   } catch {
     return iso;
   }
 }
 
+/**
+ * Activity timestamps in the user's device local timezone.
+ * e.g. "Today, 10:15 PM" · "Yesterday, 7:40 PM" · "Aug 6, 4:30 PM" · "Aug 2, 2026 · 8:15 PM"
+ */
+export function formatActivityTime(iso: string, now = new Date()): string {
+  try {
+    const d = parseLocalDate(iso);
+    const time = format(d, 'h:mm a');
+    if (isToday(d)) return `Today, ${time}`;
+    if (isYesterday(d)) return `Yesterday, ${time}`;
+    if (d.getFullYear() === now.getFullYear()) {
+      return `${format(d, 'MMM d')}, ${time}`;
+    }
+    return `${format(d, 'MMM d, yyyy')} · ${time}`;
+  } catch {
+    return iso;
+  }
+}
+
+/**
+ * Device-local greeting bands:
+ * 05:00–11:59 Good morning
+ * 12:00–16:59 Good afternoon
+ * 17:00–20:59 Good evening
+ * 21:00–04:59 Good night
+ */
 export function greetingForNow(date = new Date()): string {
   const h = date.getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h >= 5 && h < 12) return 'Good morning';
+  if (h >= 12 && h < 17) return 'Good afternoon';
+  if (h >= 17 && h < 21) return 'Good evening';
+  return 'Good night';
 }
 
 /** Local calendar date as YYYY-MM-DD (not UTC). */

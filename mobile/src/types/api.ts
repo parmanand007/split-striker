@@ -4,7 +4,16 @@ export interface User {
   id: number;
   name: string;
   email: string | null;
+  avatar_color?: string | null;
+  avatar_url?: string | null;
+  avatar_updated_at?: string | null;
   created_at: string;
+}
+
+export interface UserUpdateInput {
+  name?: string;
+  email?: string;
+  avatar_color?: string | null;
 }
 
 export interface AuthResponse {
@@ -20,6 +29,8 @@ export interface Group {
   simplify_debts: boolean;
   created_by_id: number | null;
   emoji: string | null;
+  budget?: string | null;
+  category_budgets?: Record<string, string> | null;
   created_at: string;
   members: User[];
 }
@@ -38,6 +49,10 @@ export interface GroupUpdateInput {
   archived?: boolean;
   simplify_debts?: boolean;
   emoji?: string | null;
+  budget?: string | number | null;
+  clear_budget?: boolean;
+  category_budgets?: Record<string, string> | null;
+  clear_category_budgets?: boolean;
 }
 
 export interface GroupBalanceItem {

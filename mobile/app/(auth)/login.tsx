@@ -2,14 +2,15 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { TextField } from '@/src/components/ui/TextField';
 import { Button } from '@/src/components/ui/Button';
 import { AuthErrorBanner } from '@/src/components/ui/AuthErrorBanner';
 import { AuthCard, AuthShell } from '@/src/components/ui/AuthShell';
+import { LogoWordmark } from '@/src/components/ui/Logo';
+import { AppText } from '@/src/components/ui/AppText';
 import { MARKETING } from '@/src/theme/themes';
+import { fonts } from '@/src/theme/typography';
 import { useAuthActions } from '@/src/features/auth/useAuthActions';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useEffect } from 'react';
@@ -53,25 +54,16 @@ export default function LoginScreen() {
         accessibilityLabel="Go back"
         style={styles.backBtn}
       >
-        <Text style={styles.back}>← Back</Text>
+        <AppText style={styles.back}>← Back</AppText>
       </Pressable>
 
       <View style={styles.brand}>
-        <LinearGradient
-          colors={[MARKETING.brand800, MARKETING.brand600, MARKETING.accentSoft]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.logo}
-        >
-          <Ionicons name="flash" size={22} color="#fff" />
-        </LinearGradient>
-        <Text style={styles.wordmark}>Split Striker Wise</Text>
-        <Text style={styles.tagline}>Split expenses. Stay friends.</Text>
+        <LogoWordmark size="lg" subtitle="Split expenses. Stay friends." />
       </View>
 
       <AuthCard>
-        <Text style={styles.title}>Welcome back</Text>
-        <Text style={styles.sub}>Sign in to your account.</Text>
+        <AppText style={styles.title}>Welcome back</AppText>
+        <AppText style={styles.sub}>Sign in to your account.</AppText>
 
         <AuthErrorBanner message={error || sessionExpiredMessage} />
 
@@ -126,7 +118,7 @@ export default function LoginScreen() {
           />
 
           <Button
-            title="Sign in →"
+            title="Sign in"
             variant="marketing"
             testID="login-submit"
             loading={busy}
@@ -143,7 +135,7 @@ export default function LoginScreen() {
         }
         style={styles.link}
       >
-        <Text style={styles.linkText}>Need an account? Sign up</Text>
+        <AppText style={styles.linkText}>Need an account? Sign up</AppText>
       </Link>
     </AuthShell>
   );
@@ -151,20 +143,16 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   backBtn: { minHeight: 44, justifyContent: 'center', marginBottom: 8 },
-  back: { color: MARKETING.textMuted, fontWeight: '600' },
-  brand: { alignItems: 'center', marginBottom: 28, gap: 10 },
-  logo: {
-    width: 56,
-    height: 56,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+  back: { color: MARKETING.textMuted, fontFamily: fonts.semibold },
+  brand: { alignItems: 'center', marginBottom: 28 },
+  title: {
+    color: '#fff',
+    fontSize: 20,
+    fontFamily: fonts.bold,
+    marginBottom: 4,
   },
-  wordmark: { color: '#fff', fontSize: 20, fontWeight: '800' },
-  tagline: { color: MARKETING.textMuted, fontSize: 14 },
-  title: { color: '#fff', fontSize: 20, fontWeight: '700', marginBottom: 4 },
   sub: { color: MARKETING.textMuted, fontSize: 14, marginBottom: 20 },
   form: { gap: 12 },
   link: { marginTop: 20, alignSelf: 'center', minHeight: 44, justifyContent: 'center' },
-  linkText: { color: MARKETING.accentSoft, fontWeight: '600' },
+  linkText: { color: MARKETING.accentSoft, fontFamily: fonts.semibold },
 });

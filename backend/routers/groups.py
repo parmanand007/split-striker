@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -20,17 +21,29 @@ def _get_group(group_id: int, db: Session) -> Group:
 
 @router.post("", response_model=GroupOut, status_code=201)
 def create_group(body: GroupCreate, db: Session = Depends(get_db)):
+    creator_id = body.created_by_id
+    extra_members = [uid for uid in body.member_ids if uid != creator_id]
+    if extra_members:
+        raise HTTPException(
+            400,
+            "Members can only join via an invite link. Create the group first, then share an invite.",
+        )
+
+    member_ids = [creator_id] if creator_id is not None else []
+    if not member_ids and body.member_ids:
+        member_ids = [body.member_ids[0]]
+
     group = Group(
         name=body.name,
         currency=body.currency.upper(),
         simplify_debts=body.simplify_debts,
-        created_by_id=body.created_by_id,
+        created_by_id=creator_id,
         emoji=body.emoji,
     )
     db.add(group)
     db.flush()
 
-    for uid in body.member_ids:
+    for uid in member_ids:
         user = db.query(User).filter(User.id == uid).first()
         if not user:
             raise HTTPException(404, f"User {uid} not found.")
@@ -84,12 +97,32 @@ def update_group(group_id: int, body: GroupUpdate, db: Session = Depends(get_db)
         group.simplify_debts = body.simplify_debts
     if body.emoji is not None:
         group.emoji = body.emoji
+    if body.clear_budget:
+        group.budget = None
+    elif body.budget is not None:
+        if body.budget < 0:
+            raise HTTPException(400, "Budget cannot be negative.")
+        group.budget = body.budget
+    if body.clear_category_budgets:
+        group.category_budgets = None
+    elif body.category_budgets is not None:
+        cleaned = {}
+        for key, val in body.category_budgets.items():
+            try:
+                n = Decimal(str(val))
+            except Exception:
+                raise HTTPException(400, f"Invalid category budget for {key}.")
+            if n < 0:
+                raise HTTPException(400, f"Category budget for {key} cannot be negative.")
+            cleaned[str(key)] = str(n)
+        group.category_budgets = cleaned or None
+    details = body.model_dump(exclude_none=True, mode="json")
     db.add(ActivityLog(
         group_id=group.id,
         action_type=ActionType.EDIT,
         entity_type=EntityType.GROUP,
         entity_id=group.id,
-        details=body.model_dump(exclude_none=True),
+        details=details,
     ))
     db.commit()
     db.refresh(group)
@@ -111,26 +144,10 @@ def delete_group(group_id: int, actor_user_id: int, db: Session = Depends(get_db
 
 @router.post("/{group_id}/members", response_model=GroupOut)
 def add_member(group_id: int, body: AddMemberRequest, db: Session = Depends(get_db)):
-    group = _get_group(group_id, db)
-    if group.archived:
-        raise HTTPException(400, "Cannot add members to an archived group.")
-    user = db.query(User).filter(User.id == body.user_id).first()
-    if not user:
-        raise HTTPException(404, f"User {body.user_id} not found.")
-    if user in group.members:
-        raise HTTPException(400, f"{user.name} is already a member of this group.")
-    group.members.append(user)
-    db.add(ActivityLog(
-        group_id=group.id,
-        actor_user_id=body.user_id,
-        action_type=ActionType.MEMBER_ADD,
-        entity_type=EntityType.MEMBER,
-        entity_id=user.id,
-        details={"user_name": user.name},
-    ))
-    db.commit()
-    db.refresh(group)
-    return group
+    raise HTTPException(
+        403,
+        "Members can only join via an invite link. Generate an invite from group settings or members.",
+    )
 
 
 @router.delete("/{group_id}/members/{user_id}", response_model=GroupOut)

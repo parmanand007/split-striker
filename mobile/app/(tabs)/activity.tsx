@@ -1,14 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { getUserActivity } from '@/src/api/users';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
-import { EmptyView, ErrorView, LoadingView } from '@/src/components/ui/StateViews';
-import { activityTitle } from '@/src/utils/activity';
-import { relativeTime } from '@/src/utils/format';
+import { AppText } from '@/src/components/ui/AppText';
+import { EmptyView, ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
+import { activityIconName, activityTitle } from '@/src/utils/activity';
+import { formatActivityTime } from '@/src/utils/format';
 
 export default function ActivityScreen() {
   const user = useAuthStore((s) => s.user);
@@ -20,7 +23,13 @@ export default function ActivityScreen() {
     enabled: !!user,
   });
 
-  if (query.isLoading) return <LoadingView />;
+  if (query.isLoading) {
+    return (
+      <Screen inTabs>
+        <ListSkeleton />
+      </Screen>
+    );
+  }
   if (query.isError) {
     return (
       <ErrorView
@@ -39,15 +48,21 @@ export default function ActivityScreen() {
       refreshing={query.isRefetching}
       onRefresh={() => void query.refetch()}
     >
-      <Text style={[styles.title, { color: t.text }]}>Activity</Text>
+      <AppText variant="display" style={{ marginBottom: 4 }}>
+        Activity
+      </AppText>
+      <AppText muted variant="bodySm" style={{ marginBottom: 16 }}>
+        Recent expenses, payments, and group updates
+      </AppText>
       {logs.length === 0 ? (
         <EmptyView
           compact
+          icon="pulse-outline"
           title="No activity yet"
           message="Expenses and payments will show up here."
         />
       ) : (
-        <Card>
+        <Card elevated="sm" padded={false}>
           {logs.map((log, idx) => {
             const canOpenExpense =
               log.entity_type === 'expense' && log.entity_id != null && log.group_id != null;
@@ -74,10 +89,20 @@ export default function ActivityScreen() {
                   },
                 ]}
               >
-                <Text style={{ color: t.text, fontWeight: '600' }}>{activityTitle(log)}</Text>
-                <Text style={{ color: t.textMuted, fontSize: 12, marginTop: 4 }}>
-                  {relativeTime(log.created_at)}
-                </Text>
+                <View style={[styles.icon, { backgroundColor: t.brand50 }]}>
+                  <Ionicons name={activityIconName(log)} size={16} color={t.brand600} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <AppText variant="body" style={{ fontWeight: '600' }} numberOfLines={2}>
+                    {activityTitle(log)}
+                  </AppText>
+                  <AppText muted variant="caption" style={{ marginTop: 4 }}>
+                    {formatActivityTime(log.created_at)}
+                  </AppText>
+                </View>
+                {canOpenExpense ? (
+                  <Ionicons name="chevron-forward" size={16} color={t.textMuted} />
+                ) : null}
               </Pressable>
             );
           })}
@@ -88,6 +113,19 @@ export default function ActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 28, fontWeight: '800', marginBottom: 16 },
-  row: { paddingVertical: 12, minHeight: 56, justifyContent: 'center' },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 64,
+  },
+  icon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

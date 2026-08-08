@@ -2,16 +2,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { AppText } from '@/src/components/ui/AppText';
+import { fonts } from '@/src/theme/typography';
 import type { Expense, ExpenseCreateInput, Group, SplitType, User } from '@/src/types/api';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { TextField } from '@/src/components/ui/TextField';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
+import { CurrencyPicker } from '@/src/components/ui/CurrencyPicker';
+import { CategoryIcon } from '@/src/components/expenses/CategoryIcon';
 import { todayISO } from '@/src/utils/format';
 import {
   EXPENSE_CATEGORIES,
-  EXPENSE_CURRENCIES,
   SPLIT_TYPE_OPTIONS,
 } from './constants';
 import {
@@ -195,7 +198,7 @@ export function ExpenseForm({
         )}
       />
       {duplicateWarning ? (
-        <Text style={[styles.warn, { color: '#d97706' }]}>⚠ {duplicateWarning}</Text>
+        <AppText style={[styles.warn, { color: t.brand700 }]}>{duplicateWarning}</AppText>
       ) : null}
 
       <View style={styles.row2}>
@@ -216,40 +219,27 @@ export function ExpenseForm({
           />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.label, { color: t.textMuted }]}>Currency</Text>
-          <View style={styles.chips}>
-            {EXPENSE_CURRENCIES.map((c) => (
-              <Pressable
-                key={c}
-                onPress={() => setValue('currency', c, { shouldValidate: true })}
-                style={[
-                  styles.chipSm,
-                  {
-                    backgroundColor: currency.toUpperCase() === c ? t.brand500 : t.cardBg,
-                    borderColor: t.cardBorder,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    color: currency.toUpperCase() === c ? t.btnPrimaryText : t.text,
-                    fontWeight: '700',
-                    fontSize: 12,
-                  }}
-                >
-                  {c}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+          <Controller
+            control={control}
+            name="currency"
+            render={({ field: { onChange, value } }) => (
+              <CurrencyPicker
+                label="Currency"
+                value={value}
+                onChange={(code) => onChange(code)}
+                error={errors.currency?.message}
+                includeCodes={[group.currency, expense?.original_currency || '']}
+              />
+            )}
+          />
         </View>
       </View>
 
       {needsFx ? (
         <Card style={{ gap: 8, backgroundColor: t.brand50 }}>
-          <Text style={{ color: t.text, fontWeight: '700', fontSize: 13 }}>
+          <AppText style={{ color: t.text, fontFamily: fonts.bold, fontSize: 13 }}>
             Exchange rate: 1 {currency.toUpperCase()} = ? {group.currency}
-          </Text>
+          </AppText>
           <Controller
             control={control}
             name="fxRate"
@@ -263,9 +253,9 @@ export function ExpenseForm({
               />
             )}
           />
-          <Text style={{ color: t.textMuted, fontSize: 12 }}>
+          <AppText style={{ color: t.textMuted, fontSize: 12 }}>
             Balances use the converted group-currency total (calculated by the server).
-          </Text>
+          </AppText>
         </Card>
       ) : null}
 
@@ -282,15 +272,15 @@ export function ExpenseForm({
             },
           ]}
         >
-          {isNegative ? <Text style={{ color: t.btnPrimaryText, fontSize: 12 }}>✓</Text> : null}
+          {isNegative ? <AppText style={{ color: t.btnPrimaryText, fontSize: 12 }}>✓</AppText> : null}
         </View>
-        <Text style={{ color: t.text, flex: 1, fontWeight: '600' }}>
+        <AppText style={{ color: t.text, flex: 1, fontFamily: fonts.semibold }}>
           This is a refund / adjustment
-        </Text>
+        </AppText>
       </Pressable>
 
       <View style={styles.sectionHead}>
-        <Text style={[styles.section, { color: t.text }]}>Paid by</Text>
+        <AppText style={[styles.section, { color: t.text }]}>Paid by</AppText>
         <Pressable
           onPress={() => {
             setMultiplePayers((v) => {
@@ -309,9 +299,9 @@ export function ExpenseForm({
             });
           }}
         >
-          <Text style={{ color: t.brand600, fontWeight: '700', fontSize: 13 }}>
+          <AppText style={{ color: t.brand600, fontFamily: fonts.bold, fontSize: 13 }}>
             {multiplePayers ? 'Single payer' : 'Multiple payers'}
-          </Text>
+          </AppText>
         </Pressable>
       </View>
 
@@ -331,14 +321,14 @@ export function ExpenseForm({
                   },
                 ]}
               >
-                <Text
+                <AppText
                   style={{
                     color: selected ? t.btnPrimaryText : t.text,
-                    fontWeight: '700',
+                    fontFamily: fonts.bold,
                   }}
                 >
                   {youLabel(m)}
-                </Text>
+                </AppText>
               </Pressable>
             );
           })}
@@ -360,7 +350,7 @@ export function ExpenseForm({
                     },
                   ]}
                 >
-                  <Text style={{ color: t.text, fontWeight: '600' }}>{youLabel(m)}</Text>
+                  <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>{youLabel(m)}</AppText>
                 </Pressable>
                 {selected ? (
                   <TextField
@@ -379,7 +369,7 @@ export function ExpenseForm({
         </View>
       )}
 
-      <Text style={[styles.section, { color: t.text }]}>Split</Text>
+      <AppText style={[styles.section, { color: t.text }]}>Split</AppText>
       <View style={styles.chips}>
         {SPLIT_TYPE_OPTIONS.map((st) => {
           const selected = splitType === st.value;
@@ -395,24 +385,24 @@ export function ExpenseForm({
                 },
               ]}
             >
-              <Text
+              <AppText
                 style={{
                   color: selected ? t.btnPrimaryText : t.text,
-                  fontWeight: '700',
+                  fontFamily: fonts.bold,
                 }}
               >
                 {st.label}
-              </Text>
+              </AppText>
             </Pressable>
           );
         })}
       </View>
-      <Text style={{ color: t.textMuted, fontSize: 12, marginBottom: 8 }}>
+      <AppText style={{ color: t.textMuted, fontSize: 12, marginBottom: 8 }}>
         {splitDetailsHint(splitType)}
-      </Text>
+      </AppText>
 
       <View style={styles.sectionHead}>
-        <Text style={[styles.section, { color: t.text, marginTop: 0 }]}>Split among</Text>
+        <AppText style={[styles.section, { color: t.text, marginTop: 0 }]}>Split among</AppText>
         <Pressable
           onPress={() =>
             setSplitAmongOverride(
@@ -420,9 +410,9 @@ export function ExpenseForm({
             )
           }
         >
-          <Text style={{ color: t.brand600, fontWeight: '700', fontSize: 13 }}>
+          <AppText style={{ color: t.brand600, fontFamily: fonts.bold, fontSize: 13 }}>
             {splitAmong.length === members.length ? 'Clear' : 'Select all'}
-          </Text>
+          </AppText>
         </Pressable>
       </View>
 
@@ -441,10 +431,10 @@ export function ExpenseForm({
                   },
                 ]}
               >
-                <Text style={{ color: t.text, fontWeight: '600' }}>{youLabel(m)}</Text>
-                <Text style={{ color: selected ? t.brand600 : t.textMuted, fontWeight: '700' }}>
+                <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>{youLabel(m)}</AppText>
+                <AppText style={{ color: selected ? t.brand600 : t.textMuted, fontFamily: fonts.bold }}>
                   {selected ? 'On' : 'Off'}
-                </Text>
+                </AppText>
               </Pressable>
               {selected && splitType !== 'equal' ? (
                 <TextField
@@ -470,26 +460,29 @@ export function ExpenseForm({
         })}
       </View>
 
-      <Text style={[styles.section, { color: t.text }]}>Category</Text>
+      <AppText style={[styles.section, { color: t.text }]}>Category</AppText>
       <View style={styles.chips}>
         <Pressable
           onPress={() => setValue('category', '')}
           style={[
             styles.chip,
+            styles.catChip,
             {
-              backgroundColor: !category ? t.brand500 : t.cardBg,
-              borderColor: t.cardBorder,
+              backgroundColor: !category ? t.brand50 : t.cardBg,
+              borderColor: !category ? t.brand500 : t.cardBorder,
             },
           ]}
         >
-          <Text
+          <CategoryIcon category={null} size={28} />
+          <AppText
             style={{
-              color: !category ? t.btnPrimaryText : t.text,
-              fontWeight: '600',
+              color: !category ? t.brand700 : t.text,
+              fontFamily: fonts.semibold,
+              fontSize: 13,
             }}
           >
             None
-          </Text>
+          </AppText>
         </Pressable>
         {EXPENSE_CATEGORIES.map((c) => {
           const selected = category === c;
@@ -499,26 +492,29 @@ export function ExpenseForm({
               onPress={() => setValue('category', c)}
               style={[
                 styles.chip,
+                styles.catChip,
                 {
-                  backgroundColor: selected ? t.brand500 : t.cardBg,
+                  backgroundColor: selected ? t.brand50 : t.cardBg,
                   borderColor: selected ? t.brand500 : t.cardBorder,
                 },
               ]}
             >
-              <Text
+              <CategoryIcon category={c} size={28} />
+              <AppText
                 style={{
-                  color: selected ? t.btnPrimaryText : t.text,
-                  fontWeight: '600',
+                  color: selected ? t.brand700 : t.text,
+                  fontFamily: fonts.semibold,
+                  fontSize: 13,
                 }}
               >
                 {c}
-              </Text>
+              </AppText>
             </Pressable>
           );
         })}
       </View>
 
-      <Text style={[styles.section, { color: t.text }]}>Date</Text>
+      <AppText style={[styles.section, { color: t.text }]}>Date</AppText>
       <Controller
         control={control}
         name="date"
@@ -548,41 +544,42 @@ export function ExpenseForm({
               },
             ]}
           >
-            <Text
+            <AppText
               style={{
                 color: date === opt.value ? t.btnPrimaryText : t.text,
-                fontWeight: '700',
+                fontFamily: fonts.bold,
                 fontSize: 12,
               }}
             >
               {opt.label}
-            </Text>
+            </AppText>
           </Pressable>
         ))}
       </View>
 
       {formError ? (
-        <Text style={[styles.errorBox, { color: t.danger, backgroundColor: t.brand50 }]}>
+        <AppText style={[styles.errorBox, { color: t.danger, backgroundColor: t.brand50 }]}>
           {formError}
-        </Text>
+        </AppText>
       ) : null}
 
       <Button
         title={isEditing ? 'Save changes' : 'Add expense'}
+        fullWidth={false}
         style={{ marginTop: 16 }}
         loading={submitting}
         onPress={handleSubmit(submit)}
       />
-      <Text style={{ color: t.textMuted, fontSize: 11, marginTop: 8, lineHeight: 16 }}>
+      <AppText style={{ color: t.textMuted, fontSize: 11, marginTop: 8, lineHeight: 16 }}>
         Splits and balances are calculated on the server. Notes and receipt uploads are not
         supported by the API yet.
-      </Text>
+      </AppText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { fontSize: 15, fontWeight: '800', marginTop: 18, marginBottom: 8 },
+  section: { fontSize: 15, fontFamily: fonts.extrabold, marginTop: 18, marginBottom: 8 },
   sectionHead: {
     marginTop: 18,
     marginBottom: 8,
@@ -590,11 +587,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  label: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
+  label: { fontSize: 12, fontFamily: fonts.bold, marginBottom: 6 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  catChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
   chip: {
     borderWidth: 1,
-    borderRadius: 999,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     minHeight: 44,
@@ -602,7 +600,7 @@ const styles = StyleSheet.create({
   },
   chipSm: {
     borderWidth: 1,
-    borderRadius: 999,
+    borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     minHeight: 44,
@@ -637,13 +635,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  warn: { fontSize: 12, fontWeight: '600', marginTop: 6 },
+  warn: { fontSize: 12, fontFamily: fonts.semibold, marginTop: 6 },
   errorBox: {
     marginTop: 12,
     padding: 12,
     borderRadius: 12,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: fonts.semibold,
     overflow: 'hidden',
   },
 });

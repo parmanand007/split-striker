@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Group } from '@/src/types/api';
 import { useThemeStore } from '@/src/stores/themeStore';
-
-// Match web Sidebar GROUP_COLORS (violet/sky/amber/rose/teal/orange).
-const COLORS = ['#8b5cf6', '#0ea5e9', '#f59e0b', '#f43f5e', '#14b8a6', '#f97316'];
+import { AppText } from '@/src/components/ui/AppText';
+import { Avatar } from '@/src/components/ui/Avatar';
+import { fonts } from '@/src/theme/typography';
+import { motion, shadow } from '@/src/theme/tokens';
 
 interface Props {
   group: Group;
@@ -14,31 +15,34 @@ interface Props {
 
 export function GroupRow({ group, balanceLabel, onPress }: Props) {
   const t = useThemeStore((s) => s.tokens);
-  const color = COLORS[group.id % COLORS.length];
 
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
-        { borderColor: t.cardBorder, backgroundColor: t.cardBg, opacity: pressed ? 0.9 : 1 },
+        {
+          borderColor: t.cardBorder,
+          backgroundColor: t.cardBg,
+          opacity: pressed ? 0.92 : 1,
+          transform: [{ scale: pressed ? motion.pressScale : 1 }],
+          ...shadow('sm'),
+        },
       ]}
     >
-      <View style={[styles.icon, { backgroundColor: color }]}>
-        <Text style={styles.emoji}>{group.emoji || group.name.slice(0, 1).toUpperCase()}</Text>
-      </View>
+      <Avatar name={group.emoji || group.name} seed={group.id} size={42} />
       <View style={styles.meta}>
-        <Text style={[styles.name, { color: t.text }]} numberOfLines={1}>
+        <AppText variant="titleSm" numberOfLines={1} style={{ fontSize: 16 }}>
           {group.name}
-        </Text>
-        <Text style={{ color: t.textMuted, fontSize: 13 }}>
-          {group.members.length} members · {group.currency}
+        </AppText>
+        <AppText muted variant="caption">
+          {(group.members?.length ?? 0)} members · {group.currency}
           {group.archived ? ' · archived' : ''}
-        </Text>
+        </AppText>
       </View>
-      <Text style={{ color: t.textMuted, fontSize: 13, marginRight: 4 }}>
+      <AppText muted variant="caption" style={{ fontFamily: fonts.bold, marginRight: 2 }}>
         {balanceLabel ?? 'Open'}
-      </Text>
+      </AppText>
       <Ionicons name="chevron-forward" size={16} color={t.textMuted} />
     </Pressable>
   );
@@ -51,17 +55,8 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 14,
     borderRadius: 16,
-    borderWidth: 1,
-    minHeight: 64,
+    borderWidth: StyleSheet.hairlineWidth,
+    minHeight: 68,
   },
-  icon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emoji: { color: '#fff', fontWeight: '700', fontSize: 16 },
   meta: { flex: 1, gap: 2 },
-  name: { fontSize: 16, fontWeight: '700' },
 });

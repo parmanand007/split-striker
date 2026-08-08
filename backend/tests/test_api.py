@@ -12,6 +12,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+import io
+
+from PIL import Image
 
 from database import Base, get_db
 from dependencies import get_current_user
@@ -47,6 +50,19 @@ def client():
     app.dependency_overrides.clear()
 
 
+@pytest.fixture
+def avatar_tmp(tmp_path):
+    d = tmp_path / "avatars"
+    d.mkdir()
+    return d
+
+
+def _tiny_jpeg() -> bytes:
+    buf = io.BytesIO()
+    Image.new("RGB", (32, 32), color=(190, 18, 64)).save(buf, format="JPEG")
+    return buf.getvalue()
+
+
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
 def mk_user(client, name="Alice", email="alice@test.com"):
@@ -55,12 +71,32 @@ def mk_user(client, name="Alice", email="alice@test.com"):
     return r.json()
 
 def mk_group(client, name="Trip", currency="INR", members=(), owner_id=None):
+    members = list(members)
+    creator = owner_id if owner_id is not None else (members[0] if members else None)
+    if creator is None:
+        u = mk_user(client)
+        creator = u["id"]
+        members = [creator] if not members else members
+
     r = client.post("/api/groups", json={
         "name": name, "currency": currency,
-        "member_ids": list(members), "created_by_id": owner_id,
+        "member_ids": [creator], "created_by_id": creator,
     })
     assert r.status_code == 201, r.text
-    return r.json()
+    g = r.json()
+
+    for uid in members:
+        if uid == creator:
+            continue
+        inv = client.post(f"/api/invite/groups/{g['id']}/create?actor_user_id={creator}")
+        assert inv.status_code == 200, inv.text
+        token = inv.json()["token"]
+        acc = client.post(f"/api/invite/{token}/accept", json={"user_id": uid})
+        assert acc.status_code == 200, acc.text
+
+    r2 = client.get(f"/api/groups/{g['id']}")
+    assert r2.status_code == 200
+    return r2.json()
 
 def mk_expense(client, gid, desc, amount, payer_id, split_ids, date="2025-01-01", split_type="equal"):
     r = client.post(f"/api/groups/{gid}/expenses", json={
@@ -140,6 +176,44 @@ class TestUsers:
         r = client.get(f"/api/users/{u['id']}")
         assert r.status_code == 200
         assert r.json()["id"] == u["id"]
+
+    def test_update_user_profile(self, client):
+        u = mk_user(client, "Alice", "alice@test.com")
+        r = client.put(
+            f"/api/users/{u['id']}",
+            json={"name": "Alice Updated", "email": "alice2@test.com"},
+        )
+        assert r.status_code == 200, r.text
+        assert r.json()["name"] == "Alice Updated"
+        assert r.json()["email"] == "alice2@test.com"
+
+    def test_update_user_duplicate_email_rejected(self, client):
+        a = mk_user(client, "Alice", "a@t.com")
+        mk_user(client, "Bob", "b@t.com")
+        r = client.put(f"/api/users/{a['id']}", json={"email": "b@t.com"})
+        assert r.status_code == 400
+
+    def test_upload_and_get_avatar(self, client, avatar_tmp, monkeypatch):
+        monkeypatch.setenv("AVATAR_UPLOAD_DIR", str(avatar_tmp))
+        u = mk_user(client, "Alice", "a@t.com")
+        jpeg = _tiny_jpeg()
+        r = client.post(
+            f"/api/users/{u['id']}/avatar",
+            files={"file": ("avatar.jpg", jpeg, "image/jpeg")},
+        )
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert data["avatar_url"] is not None
+        assert f"/api/users/{u['id']}/avatar" in data["avatar_url"]
+
+        img = client.get(f"/api/users/{u['id']}/avatar")
+        assert img.status_code == 200
+        assert img.headers["content-type"].startswith("image/jpeg")
+
+        deleted = client.delete(f"/api/users/{u['id']}/avatar")
+        assert deleted.status_code == 200
+        assert deleted.json()["avatar_url"] is None
+        assert client.get(f"/api/users/{u['id']}/avatar").status_code == 404
 
     def test_get_nonexistent_user_404(self, client):
         assert client.get("/api/users/99999").status_code == 404
@@ -291,25 +365,48 @@ class TestGroups:
         assert r.status_code == 200
         assert r.json()["name"] == "Renamed"
 
+    def test_set_and_clear_group_budget(self, client):
+        u = mk_user(client)
+        g = mk_group(client, members=[u["id"]])
+        r = client.put(
+            f"/api/groups/{g['id']}",
+            json={"budget": "50000", "category_budgets": {"Food & Drink": "12000"}},
+        )
+        assert r.status_code == 200, r.text
+        assert float(r.json()["budget"]) == 50000
+        assert r.json()["category_budgets"]["Food & Drink"] == "12000"
+        r2 = client.put(f"/api/groups/{g['id']}", json={"clear_budget": True, "clear_category_budgets": True})
+        assert r2.status_code == 200
+        assert r2.json()["budget"] is None
+        assert r2.json().get("category_budgets") in (None, {})
+
     def test_archive_group(self, client):
         u = mk_user(client)
         g = mk_group(client, members=[u["id"]])
         r = client.put(f"/api/groups/{g['id']}", json={"archived": True})
         assert r.json()["archived"] is True
 
-    def test_add_member(self, client):
+    def test_add_member_requires_invite(self, client):
         a = mk_user(client, "Alice", "a@t.com")
         b = mk_user(client, "Bob", "b@t.com")
         g = mk_group(client, members=[a["id"]])
         r = client.post(f"/api/groups/{g['id']}/members", json={"user_id": b["id"]})
-        assert r.status_code == 200
-        assert b["id"] in [m["id"] for m in r.json()["members"]]
+        assert r.status_code == 403
+
+    def test_create_group_rejects_direct_extra_members(self, client):
+        a = mk_user(client, "Alice", "a@t.com")
+        b = mk_user(client, "Bob", "b@t.com")
+        r = client.post("/api/groups", json={
+            "name": "Trip", "currency": "INR",
+            "member_ids": [a["id"], b["id"]], "created_by_id": a["id"],
+        })
+        assert r.status_code == 400
 
     def test_add_duplicate_member_rejected(self, client):
         a = mk_user(client)
         g = mk_group(client, members=[a["id"]])
         r = client.post(f"/api/groups/{g['id']}/members", json={"user_id": a["id"]})
-        assert r.status_code == 400
+        assert r.status_code == 403
 
     def test_add_member_to_archived_group_rejected(self, client):
         a = mk_user(client, "Alice", "a@t.com")
@@ -317,7 +414,7 @@ class TestGroups:
         g = mk_group(client, members=[a["id"]])
         client.put(f"/api/groups/{g['id']}", json={"archived": True})
         r = client.post(f"/api/groups/{g['id']}/members", json={"user_id": b["id"]})
-        assert r.status_code == 400
+        assert r.status_code == 403
 
     def test_remove_member_zero_balance_ok(self, client):
         a = mk_user(client, "Alice", "a@t.com")
@@ -496,6 +593,22 @@ class TestExpenses:
         assert r.status_code == 200
         total = sum(float(v) for v in r.json()["split_amounts"].values())
         assert abs(total - 200) < 0.01
+
+    def test_update_expense_with_date_field(self, client):
+        a, b, c, g = self._setup(client)
+        e = mk_expense(client, g["id"], "D", 100, a["id"], [a["id"], b["id"]])
+        r = client.put(f"/api/expenses/{e['id']}", json={
+            "description": "Updated",
+            "original_amount": "200",
+            "original_currency": "INR",
+            "paid_by": {str(a["id"]): "200"},
+            "split_type": "equal",
+            "split_among": [a["id"], b["id"]],
+            "date": "2026-08-09",
+        })
+        assert r.status_code == 200
+        assert r.json()["description"] == "Updated"
+        assert r.json()["date"] == "2026-08-09"
 
     def test_delete_expense_soft(self, client):
         a, b, c, g = self._setup(client)

@@ -60,6 +60,7 @@ class User(Base):
     email: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, unique=True, index=True)
     password_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     avatar_color: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    avatar_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     groups: Mapped[List["Group"]] = relationship(
@@ -79,6 +80,10 @@ class Group(Base):
         Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     emoji: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    # Optional trip/group budget in group currency. Null = no budget configured.
+    budget: Mapped[Optional[Decimal]] = mapped_column(Numeric(14, 2), nullable=True)
+    # Optional per-category budgets: {"Food & Drink": "12000", ...}
+    category_budgets: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     members: Mapped[List["User"]] = relationship(

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { Alert, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, StyleSheet, Switch, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getBalances, getSettlement } from '@/src/api/balances';
 import { getGroup, updateGroup } from '@/src/api/groups';
 import { createPayment } from '@/src/api/settlements';
@@ -10,9 +12,13 @@ import { useThemeStore } from '@/src/stores/themeStore';
 import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
-import { EmptyView, ErrorView, LoadingView } from '@/src/components/ui/StateViews';
+import { AppText } from '@/src/components/ui/AppText';
+import { EmptyView, ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
 import { formatMoney, formatSignedMoney, todayISO } from '@/src/utils/format';
 import { ApiError, SettlementItem } from '@/src/types/api';
+import { space } from '@/src/theme/tokens';
+import * as Haptics from 'expo-haptics';
 
 export default function SettleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -68,6 +74,9 @@ export default function SettleScreen() {
         qc.invalidateQueries({ queryKey: ['summary'] }),
         qc.invalidateQueries({ queryKey: ['activity'] }),
       ]);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+        () => undefined,
+      );
       Alert.alert('Payment recorded');
     },
     onError: (e) => {
@@ -75,7 +84,13 @@ export default function SettleScreen() {
     },
   });
 
-  if (settlementQuery.isLoading || groupQuery.isLoading) return <LoadingView />;
+  if (settlementQuery.isLoading || groupQuery.isLoading) {
+    return (
+      <Screen withHeader>
+        <ListSkeleton rows={5} />
+      </Screen>
+    );
+  }
   if (settlementQuery.isError || !settlementQuery.data) {
     return (
       <ErrorView
@@ -101,14 +116,14 @@ export default function SettleScreen() {
           void balancesQuery.refetch();
         }}
       >
-        <Card style={styles.rowBetween}>
+        <Card elevated="sm" style={styles.rowBetween}>
           <View style={{ flex: 1, paddingRight: 12 }}>
-            <Text style={{ color: t.text, fontWeight: '700' }}>Simplify debts</Text>
-            <Text style={{ color: t.textMuted, fontSize: 12 }}>
+            <AppText style={{ fontWeight: '700' }}>Simplify debts</AppText>
+            <AppText muted variant="caption" style={{ marginTop: 2 }}>
               {isOwner
                 ? 'Fewer suggested transfers'
                 : 'Only the group owner can change this'}
-            </Text>
+            </AppText>
           </View>
           <Switch
             value={plan.simplify_debts}
@@ -119,8 +134,10 @@ export default function SettleScreen() {
           />
         </Card>
 
-        <Text style={[styles.section, { color: t.text }]}>Balances</Text>
-        <Card style={{ marginBottom: 16 }}>
+        <AppText variant="titleSm" style={styles.section}>
+          Balances
+        </AppText>
+        <Card elevated="sm" style={{ marginBottom: 16 }}>
           {balancesQuery.isError ? (
             <ErrorView
               framed={false}
@@ -128,12 +145,23 @@ export default function SettleScreen() {
               onRetry={() => void balancesQuery.refetch()}
             />
           ) : (
-            (balancesQuery.data?.balances ?? []).map((b) => {
+            (balancesQuery.data?.balances ?? []).map((b, idx, arr) => {
               const n = Number(b.balance);
               return (
-                <View key={b.user_id} style={styles.rowBetween}>
-                  <Text style={{ color: t.text }}>{b.user_name}</Text>
-                  <Text
+                <View
+                  key={b.user_id}
+                  style={[
+                    styles.rowBetween,
+                    idx < arr.length - 1 && {
+                      borderBottomWidth: StyleSheet.hairlineWidth,
+                      borderBottomColor: t.cardBorder,
+                      paddingBottom: 10,
+                      marginBottom: 6,
+                    },
+                  ]}
+                >
+                  <AppText>{b.user_name}</AppText>
+                  <AppText
                     style={{
                       color:
                         n > 0.005 ? t.positive : n < -0.005 ? t.negative : t.textMuted,
@@ -141,34 +169,59 @@ export default function SettleScreen() {
                     }}
                   >
                     {formatSignedMoney(b.balance, plan.currency)}
-                  </Text>
+                  </AppText>
                 </View>
               );
             })
           )}
         </Card>
 
-        <Text style={[styles.section, { color: t.text }]}>Suggested payments</Text>
+        <AppText variant="titleSm" style={styles.section}>
+          Suggested payments
+        </AppText>
         {plan.settlements.length === 0 ? (
-          <EmptyView compact title="All settled up" message="No payments needed right now." />
+          <EmptyView
+            compact
+            icon="checkmark-circle-outline"
+            title="All settled up"
+            message="No payments needed right now."
+          />
         ) : (
           <View style={{ gap: 10 }}>
             {plan.settlements.map((item, idx) => (
-              <Card key={`${item.from_user_id}-${item.to_user_id}-${idx}`} style={{ gap: 10 }}>
-                <Text style={{ color: t.text, fontWeight: '700' }}>
-                  {item.from_user_name} → {item.to_user_name}
-                </Text>
-                <Text style={{ color: t.textMuted }}>
-                  {formatMoney(item.amount, item.currency)}
-                </Text>
-                <Button
-                  title={paying === item ? 'Recording…' : 'Record payment'}
-                  loading={payMutation.isPending && paying === item}
-                  onPress={() => {
-                    setPaying(item);
-                    payMutation.mutate(item);
-                  }}
-                />
+              <Card
+                key={`${item.from_user_id}-${item.to_user_id}-${idx}`}
+                elevated="md"
+                padded={false}
+              >
+                <LinearGradient
+                  colors={[t.brand50, t.cardBg]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.payCard}
+                >
+                  <View style={styles.payPath}>
+                    <View style={[styles.payIcon, { backgroundColor: t.brand100 }]}>
+                      <Ionicons name="swap-horizontal" size={18} color={t.brand600} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <AppText style={{ fontWeight: '700' }}>
+                        {item.from_user_name} → {item.to_user_name}
+                      </AppText>
+                      <AppText variant="money" style={{ color: t.brand700, marginTop: 4 }}>
+                        {formatMoney(item.amount, item.currency)}
+                      </AppText>
+                    </View>
+                  </View>
+                  <Button
+                    title={paying === item ? 'Recording…' : 'Record payment'}
+                    loading={payMutation.isPending && paying === item}
+                    onPress={() => {
+                      setPaying(item);
+                      payMutation.mutate(item);
+                    }}
+                  />
+                </LinearGradient>
               </Card>
             ))}
           </View>
@@ -179,11 +232,27 @@ export default function SettleScreen() {
 }
 
 const styles = StyleSheet.create({
-  section: { fontSize: 16, fontWeight: '700', marginTop: 18, marginBottom: 8 },
+  section: { marginTop: space.xl, marginBottom: space.sm },
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  payCard: {
+    padding: space.lg,
+    gap: 12,
+  },
+  payPath: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  payIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

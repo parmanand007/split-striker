@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { createFriendExpense, getFriendExpenses } from '@/src/api/expenses';
 import { getUsers } from '@/src/api/users';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -12,9 +12,14 @@ import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
 import { TextField } from '@/src/components/ui/TextField';
-import { EmptyView, ErrorView, LoadingView } from '@/src/components/ui/StateViews';
+import { CurrencyPicker } from '@/src/components/ui/CurrencyPicker';
+import { AppText } from '@/src/components/ui/AppText';
+import { Avatar } from '@/src/components/ui/Avatar';
+import { EmptyView, ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
 import { formatMoney, todayISO } from '@/src/utils/format';
 import { ApiError } from '@/src/types/api';
+import { space } from '@/src/theme/tokens';
 
 const schema = z.object({
   description: z.string().min(1, 'Required'),
@@ -96,7 +101,13 @@ export default function FriendsScreen() {
     },
   });
 
-  if (expensesQuery.isLoading) return <LoadingView />;
+  if (expensesQuery.isLoading) {
+    return (
+      <Screen inTabs>
+        <ListSkeleton />
+      </Screen>
+    );
+  }
   if (expensesQuery.isError) {
     return (
       <ErrorView
@@ -119,7 +130,12 @@ export default function FriendsScreen() {
       onRefresh={() => expensesQuery.refetch()}
     >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: t.text }]}>Friends</Text>
+        <View style={{ flex: 1, paddingRight: 12 }}>
+          <AppText variant="display">Friends</AppText>
+          <AppText muted variant="bodySm" style={{ marginTop: 2 }}>
+            Split 50/50 with someone outside a group.
+          </AppText>
+        </View>
         <Button
           title={showForm ? 'Cancel' : 'Add expense'}
           variant={showForm ? 'secondary' : 'primary'}
@@ -127,12 +143,9 @@ export default function FriendsScreen() {
           style={{ minWidth: 120 }}
         />
       </View>
-      <Text style={{ color: t.textMuted, marginBottom: 16 }}>
-        Split 50/50 with someone outside a group.
-      </Text>
 
       {showForm ? (
-        <Card style={{ gap: 12, marginBottom: 16 }}>
+        <Card elevated="md" style={{ gap: 12, marginBottom: 16 }}>
           <Controller
             control={control}
             name="description"
@@ -162,33 +175,56 @@ export default function FriendsScreen() {
             control={control}
             name="currency"
             render={({ field: { onChange, value } }) => (
-              <TextField
+              <CurrencyPicker
                 label="Currency"
-                autoCapitalize="characters"
                 value={value}
-                onChangeText={onChange}
+                onChange={onChange}
                 error={errors.currency?.message}
               />
             )}
           />
-          <Text style={{ color: t.textMuted, fontSize: 12, fontWeight: '700' }}>Friend</Text>
+          <AppText muted variant="overline">
+            Friend
+          </AppText>
           <View style={{ gap: 8 }}>
             {usersQuery.isLoading ? (
-              <Text style={{ color: t.textMuted }}>Loading friends…</Text>
+              <AppText muted>Loading friends…</AppText>
             ) : friends.length === 0 ? (
-              <Text style={{ color: t.textMuted }}>No other users found yet.</Text>
+              <AppText muted>No other users found yet.</AppText>
             ) : (
-              friends.map((f) => (
-                <Button
-                  key={f.id}
-                  title={f.name}
-                  variant={selectedFriend === String(f.id) ? 'primary' : 'secondary'}
-                  onPress={() => setValue('otherUserId', String(f.id), { shouldValidate: true })}
-                />
-              ))
+              friends.map((f) => {
+                const selected = selectedFriend === String(f.id);
+                return (
+                  <Pressable
+                    key={f.id}
+                    onPress={() => setValue('otherUserId', String(f.id), { shouldValidate: true })}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    style={[
+                      styles.friendPick,
+                      {
+                        borderColor: selected ? t.brand500 : t.cardBorder,
+                        backgroundColor: selected ? t.brand50 : t.pageBg,
+                      },
+                    ]}
+                  >
+                    <Avatar name={f.name} seed={f.id} size={36} avatarUrl={f.avatar_url} />
+                    <AppText style={{ flex: 1, fontWeight: '700' }} numberOfLines={1}>
+                      {f.name}
+                    </AppText>
+                    {selected ? (
+                      <AppText style={{ color: t.brand600, fontWeight: '800' }} variant="caption">
+                        Selected
+                      </AppText>
+                    ) : null}
+                  </Pressable>
+                );
+              })
             )}
             {errors.otherUserId ? (
-              <Text style={{ color: t.danger }}>{errors.otherUserId.message}</Text>
+              <AppText style={{ color: t.danger }} variant="caption">
+                {errors.otherUserId.message}
+              </AppText>
             ) : null}
           </View>
           <Button
@@ -202,6 +238,7 @@ export default function FriendsScreen() {
       {expenses.length === 0 ? (
         <EmptyView
           compact
+          icon="people-outline"
           title="No friend expenses"
           message="Add a 50/50 expense with another user."
           actionLabel="Add expense"
@@ -210,11 +247,13 @@ export default function FriendsScreen() {
       ) : (
         <View style={{ gap: 10 }}>
           {expenses.map((e) => (
-            <Card key={e.id}>
-              <Text style={{ color: t.text, fontWeight: '700' }}>{e.description}</Text>
-              <Text style={{ color: t.textMuted, marginTop: 4 }}>
+            <Card key={e.id} elevated="sm">
+              <AppText variant="body" style={{ fontWeight: '700' }}>
+                {e.description}
+              </AppText>
+              <AppText muted variant="bodySm" style={{ marginTop: 4 }}>
                 {formatMoney(e.total_amount, e.original_currency)} · {e.date}
-              </Text>
+              </AppText>
             </Card>
           ))}
         </View>
@@ -227,8 +266,16 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    marginBottom: space.lg,
   },
-  title: { fontSize: 28, fontWeight: '800' },
+  friendPick: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    minHeight: 56,
+  },
 });

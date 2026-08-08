@@ -25,6 +25,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
       NSLocalNetworkUsageDescription:
         'Split Striker Wise uses your local network to reach the development API and Expo Metro server on your computer.',
+      NSPhotoLibraryUsageDescription:
+        'Split Striker Wise needs photo library access so you can choose a profile picture.',
+      NSCameraUsageDescription:
+        'Split Striker Wise needs camera access so you can take a profile picture.',
     },
   },
   android: {
@@ -53,6 +57,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-secure-store',
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'Allow Split Striker Wise to access your photos to set a profile picture.',
+        cameraPermission:
+          'Allow Split Striker Wise to use the camera for your profile picture.',
+      },
+    ],
     [
       'expo-build-properties',
       {

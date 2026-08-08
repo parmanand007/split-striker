@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getBalances } from '@/src/api/balances';
 import { getExpenses } from '@/src/api/expenses';
 import { getGroup, getGroupActivity } from '@/src/api/groups';
@@ -11,14 +12,18 @@ import { useThemeStore } from '@/src/stores/themeStore';
 import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
+import { AppText } from '@/src/components/ui/AppText';
+import { SegmentedControl } from '@/src/components/ui/SegmentedControl';
 import { ErrorView, EmptyView } from '@/src/components/ui/StateViews';
 import { ExpenseRow } from '@/src/components/expenses/ExpenseRow';
 import { MemberRow } from '@/src/components/groups/MemberRow';
-import { GroupDetailSkeleton } from '@/src/components/groups/GroupSkeleton';
+import { TripBudgetCard } from '@/src/components/groups/TripBudgetCard';
+import { GroupDetailSkeleton, GroupListSkeleton } from '@/src/components/groups/GroupSkeleton';
 import { formatGroupBalanceLabel } from '@/src/features/groups/balanceLabel';
 import { activityIconName, activityTitle } from '@/src/utils/activity';
-import { formatMoney, formatSignedMoney, relativeTime } from '@/src/utils/format';
+import { formatActivityTime, formatMoney, formatSignedMoney } from '@/src/utils/format';
 import { ApiError } from '@/src/types/api';
+import { space } from '@/src/theme/tokens';
 
 type Tab = 'expenses' | 'balances' | 'members' | 'activity';
 
@@ -133,83 +138,82 @@ export default function GroupDetailScreen() {
       />
       <Screen withHeader scroll refreshing={refreshing} onRefresh={onRefresh}>
         {archived ? (
-          <View style={[styles.banner, { backgroundColor: t.brand50 }]}>
-            <Text style={{ color: t.brand700, fontWeight: '700' }}>This group is archived</Text>
+          <View style={[styles.banner, { backgroundColor: t.brand50, borderColor: t.brand100 }]}>
+            <AppText style={{ color: t.brand700, fontWeight: '700' }}>This group is archived</AppText>
           </View>
         ) : null}
 
-        <Card style={{ marginBottom: 12 }}>
-          <Text style={{ color: t.textMuted, fontWeight: '700', fontSize: 12 }}>YOUR BALANCE</Text>
-          <Text
-            style={{
-              color:
-                myBalance > 0.005 ? t.positive : myBalance < -0.005 ? t.negative : t.text,
-              fontSize: 22,
-              fontWeight: '800',
-              marginTop: 6,
-            }}
+        <Card elevated="md" padded={false} style={{ marginBottom: 12, overflow: 'hidden' }}>
+          <LinearGradient
+            colors={[t.brand50, t.cardBg]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.balanceHero}
           >
-            {Math.abs(myBalance) < 0.005
-              ? 'All settled up'
-              : myBalance > 0
-                ? `You are owed ${formatMoney(myBalance, currency)}`
-                : `You owe ${formatMoney(Math.abs(myBalance), currency)}`}
-          </Text>
-          <Text style={{ color: t.textMuted, marginTop: 6, fontSize: 12 }}>
-            {group.members.length} members · {currency}
-          </Text>
+            <AppText muted variant="overline">
+              Your balance
+            </AppText>
+            <AppText
+              variant="title"
+              style={{
+                color:
+                  myBalance > 0.005 ? t.positive : myBalance < -0.005 ? t.negative : t.text,
+                marginTop: 6,
+              }}
+            >
+              {Math.abs(myBalance) < 0.005
+                ? 'All settled up'
+                : myBalance > 0
+                  ? `You are owed ${formatMoney(myBalance, currency)}`
+                  : `You owe ${formatMoney(Math.abs(myBalance), currency)}`}
+            </AppText>
+            <AppText muted variant="caption" style={{ marginTop: 6 }}>
+              {group.members.length} members · {currency}
+            </AppText>
+          </LinearGradient>
         </Card>
+
+        <TripBudgetCard
+          group={group}
+          expenses={expenses}
+          onEdit={
+            group.created_by_id === user?.id
+              ? () => router.push(`/groups/${groupId}/settings`)
+              : undefined
+          }
+        />
 
         <View style={styles.actions}>
           <Button
             title="Add expense"
+            fullWidth={false}
             disabled={archived}
             onPress={() =>
               router.push({ pathname: '/expenses/create', params: { groupId: String(groupId) } })
             }
-            style={{ flex: 1 }}
           />
           <Button
             title="Settle up"
             variant="secondary"
+            fullWidth={false}
             onPress={() => router.push(`/groups/${groupId}/settle`)}
-            style={{ flex: 1 }}
           />
         </View>
 
-        <View style={styles.tabs}>
-          {(['expenses', 'balances', 'members', 'activity'] as Tab[]).map((key) => (
-            <Pressable
-              key={key}
-              onPress={() => setTab(key)}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: tab === key }}
-              accessibilityLabel={`${key} tab`}
-              style={[
-                styles.tab,
-                {
-                  backgroundColor: tab === key ? t.brand500 : t.cardBg,
-                  borderColor: t.cardBorder,
-                },
-              ]}
-            >
-              <Text
-                style={{
-                  color: tab === key ? t.btnPrimaryText : t.text,
-                  fontWeight: '700',
-                  fontSize: 12,
-                  textTransform: 'capitalize',
-                }}
-              >
-                {key}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <SegmentedControl
+          value={tab}
+          onChange={setTab}
+          options={[
+            { key: 'expenses', label: 'Expenses' },
+            { key: 'balances', label: 'Balances' },
+            { key: 'members', label: 'Members' },
+            { key: 'activity', label: 'Activity' },
+          ]}
+        />
 
         {tab === 'expenses' ? (
           expensesQuery.isLoading ? (
-            <GroupDetailSkeleton />
+            <GroupListSkeleton />
           ) : expensesQuery.isError ? (
             <ErrorView
               message={
@@ -275,7 +279,7 @@ export default function GroupDetailScreen() {
               message="Balances appear after expenses are added."
             />
           ) : (
-            <Card>
+            <Card elevated="sm">
               {(balancesQuery.data?.balances ?? []).map((b, idx, arr) => (
                 <View
                   key={b.user_id}
@@ -287,11 +291,11 @@ export default function GroupDetailScreen() {
                     },
                   ]}
                 >
-                  <Text style={{ color: t.text, fontWeight: '600' }}>
+                  <AppText style={{ fontWeight: '600' }}>
                     {b.user_name}
                     {b.user_id === user?.id ? ' (you)' : ''}
-                  </Text>
-                  <Text
+                  </AppText>
+                  <AppText
                     style={{
                       color:
                         Number(b.balance) > 0.005
@@ -303,7 +307,7 @@ export default function GroupDetailScreen() {
                     }}
                   >
                     {formatSignedMoney(b.balance, currency)}
-                  </Text>
+                  </AppText>
                 </View>
               ))}
               <Button
@@ -358,7 +362,7 @@ export default function GroupDetailScreen() {
           ) : (activityQuery.data ?? []).length === 0 ? (
             <EmptyView compact title="No activity" message="Group changes will appear here." />
           ) : (
-            <Card style={{ paddingVertical: 4 }}>
+            <Card elevated="sm" padded={false} style={{ paddingVertical: 4 }}>
               {(activityQuery.data ?? []).map((log, idx, arr) => (
                 <Pressable
                   key={log.id}
@@ -389,10 +393,10 @@ export default function GroupDetailScreen() {
                     />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: t.text, fontWeight: '600' }}>{activityTitle(log)}</Text>
-                    <Text style={{ color: t.textMuted, fontSize: 12, marginTop: 2 }}>
-                      {relativeTime(log.created_at)}
-                    </Text>
+                    <AppText style={{ fontWeight: '600' }}>{activityTitle(log)}</AppText>
+                    <AppText muted variant="caption" style={{ marginTop: 2 }}>
+                      {formatActivityTime(log.created_at)}
+                    </AppText>
                   </View>
                 </Pressable>
               ))}
@@ -406,20 +410,15 @@ export default function GroupDetailScreen() {
 
 const styles = StyleSheet.create({
   banner: {
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-  },
-  actions: { flexDirection: 'row', gap: 10, marginBottom: 14 },
-  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
-  tab: {
-    minHeight: 44,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    borderRadius: 14,
+    padding: space.md,
+    marginBottom: space.md,
     borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
+  balanceHero: {
+    padding: space.lg,
+  },
+  actions: { gap: 10, marginBottom: 14, alignItems: 'center' },
   balRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -430,12 +429,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    paddingHorizontal: 16,
     paddingVertical: 12,
   },
   actIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
   },

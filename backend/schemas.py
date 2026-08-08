@@ -1,7 +1,8 @@
 from datetime import datetime, date
+from datetime import date as DateType  # alias avoids field-name shadowing in ExpenseUpdate
 from decimal import Decimal
 from typing import Optional, Dict, List, Any
-from pydantic import BaseModel, field_validator, model_validator, ConfigDict
+from pydantic import BaseModel, field_validator, model_validator, ConfigDict, computed_field
 
 from models import SplitType, ActionType, EntityType
 
@@ -33,12 +34,28 @@ class LoginBody(BaseModel):
     password: str
 
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    avatar_color: Optional[str] = None
+
+
 class UserOut(BaseModel):
     id: int
     name: str
     email: Optional[str]
+    avatar_color: Optional[str] = None
+    avatar_updated_at: Optional[datetime] = None
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def avatar_url(self) -> Optional[str]:
+        if self.avatar_updated_at is None:
+            return None
+        ts = int(self.avatar_updated_at.timestamp())
+        return f"/api/users/{self.id}/avatar?v={ts}"
 
 
 class AuthOut(BaseModel):
@@ -75,6 +92,11 @@ class GroupUpdate(BaseModel):
     archived: Optional[bool] = None
     simplify_debts: Optional[bool] = None
     emoji: Optional[str] = None
+    # Optional trip budget in group currency; null clears budget when explicitly set
+    budget: Optional[Decimal] = None
+    clear_budget: bool = False
+    category_budgets: Optional[Dict[str, str]] = None
+    clear_category_budgets: bool = False
 
 
 class GroupOut(BaseModel):
@@ -85,9 +107,18 @@ class GroupOut(BaseModel):
     simplify_debts: bool
     created_by_id: Optional[int] = None
     emoji: Optional[str] = None
+    budget: Optional[str] = None
+    category_budgets: Optional[Dict[str, str]] = None
     created_at: datetime
     members: List[UserOut]
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("budget", mode="before")
+    @classmethod
+    def budget_to_str(cls, v):
+        if v is None:
+            return None
+        return str(v)
 
 
 class AddMemberRequest(BaseModel):
@@ -137,7 +168,7 @@ class ExpenseUpdate(BaseModel):
     split_among: Optional[List[int]] = None
     split_details: Optional[Dict[str, Decimal]] = None
     category: Optional[str] = None
-    date: Optional[date] = None
+    date: Optional[DateType] = None
     is_negative: Optional[bool] = None
     actor_user_id: Optional[int] = None
 

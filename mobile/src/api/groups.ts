@@ -40,10 +40,11 @@ export function getGroupActivity(groupId: number, limit = 50) {
   return apiRequest<ActivityLog[]>('GET', `/groups/${groupId}/activity?limit=${limit}`);
 }
 
-export function createInvite(groupId: number, actorUserId: number) {
-  return apiRequest<{ token: string; expires_at: string }>(
+export function createInvite(groupId: number, actorUserId: number, inviteeEmail?: string) {
+  return apiRequest<{ token: string; expires_at: string; invitee_email?: string | null }>(
     'POST',
     `/invite/groups/${groupId}/create?actor_user_id=${actorUserId}`,
+    inviteeEmail ? { invitee_email: inviteeEmail } : undefined,
   );
 }
 

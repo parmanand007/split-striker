@@ -1,5 +1,6 @@
 import secrets
 from datetime import datetime, timedelta
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -27,14 +28,33 @@ class AcceptInviteBody(BaseModel):
     user_id: int
 
 
+class CreateInviteBody(BaseModel):
+    invitee_email: Optional[str] = None
+
+
 @router.post("/groups/{group_id}/create", dependencies=[Depends(get_current_user)])
-def create_invite(group_id: int, actor_user_id: int, db: Session = Depends(get_db)):
+def create_invite(
+    group_id: int,
+    actor_user_id: int,
+    body: CreateInviteBody | None = None,
+    db: Session = Depends(get_db),
+):
     group = db.query(Group).filter(Group.id == group_id).first()
     if not group:
         raise HTTPException(404, "Group not found.")
+    if group.archived:
+        raise HTTPException(400, "Cannot invite to an archived group.")
     actor = db.query(User).filter(User.id == actor_user_id).first()
     if not actor:
         raise HTTPException(404, "User not found.")
+    if actor not in group.members:
+        raise HTTPException(403, "Only group members can create invites.")
+
+    invitee_email = None
+    if body and body.invitee_email:
+        invitee_email = body.invitee_email.strip().lower()
+        if invitee_email and "@" not in invitee_email:
+            raise HTTPException(400, "Enter a valid invitee email.")
 
     token = secrets.token_urlsafe(32)
     invite = GroupInvite(
@@ -45,17 +65,20 @@ def create_invite(group_id: int, actor_user_id: int, db: Session = Depends(get_d
         is_active=True,
     )
     db.add(invite)
+    details = {"invited_by": actor.name}
+    if invitee_email:
+        details["invitee_email"] = invitee_email
     db.add(ActivityLog(
         group_id=group_id,
         actor_user_id=actor_user_id,
         action_type=ActionType.INVITE,
         entity_type=EntityType.GROUP,
         entity_id=group_id,
-        details={"invited_by": actor.name},
+        details=details,
     ))
     db.commit()
     db.refresh(invite)
-    return {"token": token, "expires_at": invite.expires_at}
+    return {"token": token, "expires_at": invite.expires_at, "invitee_email": invitee_email}
 
 
 @router.get("/{token}", response_model=InviteOut)

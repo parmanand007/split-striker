@@ -11,7 +11,6 @@ export default function GroupSettingsPage() {
   const navigate = useNavigate()
   const { currentUser } = useCurrentUser()
   const [group, setGroup] = useState(null)
-  const [allUsers, setAllUsers] = useState([])
   const [name, setName] = useState('')
   const [archived, setArchived] = useState(false)
   const [simplify, setSimplify] = useState(true)
@@ -20,7 +19,6 @@ export default function GroupSettingsPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [removingId, setRemovingId] = useState(null)
-  const [addUserId, setAddUserId] = useState('')
   const [inviteLink, setInviteLink] = useState('')
   const [inviteLoading, setInviteLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -40,7 +38,6 @@ export default function GroupSettingsPage() {
       setSimplify(g.simplify_debts)
       setEmoji(g.emoji || '')
     }).catch(() => navigate('/'))
-    api.getUsers(currentUser?.id).then(setAllUsers).catch(console.error)
   }, [id])
 
   useEffect(() => {
@@ -75,19 +72,6 @@ export default function GroupSettingsPage() {
       setError(err.message)
     } finally {
       setRemovingId(null)
-    }
-  }
-
-  async function addMember(e) {
-    e.preventDefault()
-    if (!addUserId) return
-    setError('')
-    try {
-      const g = await api.addMember(id, parseInt(addUserId))
-      setGroup(g)
-      setAddUserId('')
-    } catch (err) {
-      setError(err.message)
     }
   }
 
@@ -137,8 +121,6 @@ export default function GroupSettingsPage() {
 
   if (!group) return <LogoLoader variant="section" />
 
-  const memberIds = new Set(group.members.map(m => m.id))
-  const nonMembers = allUsers.filter(u => !memberIds.has(u.id))
   const pendingRequests = editRequests.filter(r => r.status === 'pending')
 
   return (
@@ -306,18 +288,11 @@ export default function GroupSettingsPage() {
           ))}
         </div>
 
-        {nonMembers.length > 0 && isOwner && (
-          <form onSubmit={addMember} className="flex gap-2 pt-3 border-t border-slate-100">
-            <select value={addUserId} onChange={e => setAddUserId(e.target.value)} className="input flex-1 text-sm">
-              <option value="">Add a member…</option>
-              {nonMembers.map(u => (
-                <option key={u.id} value={u.id}>{u.name}</option>
-              ))}
-            </select>
-            <button type="submit" disabled={!addUserId} className="btn-primary px-4 flex-none">
-              Add
-            </button>
-          </form>
+        {isOwner && (
+          <p className="text-xs text-slate-500 pt-3 border-t border-slate-100 dark:border-slate-700">
+            To add someone, generate an invite link above and share it with them. Direct member adds
+            are disabled.
+          </p>
         )}
       </div>
 

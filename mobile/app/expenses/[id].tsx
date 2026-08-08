@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { createEditRequest, deleteExpense, getExpense } from '@/src/api/expenses';
 import { getGroup } from '@/src/api/groups';
 import { useAuthStore } from '@/src/stores/authStore';
@@ -10,10 +10,15 @@ import { Screen } from '@/src/components/ui/Screen';
 import { Card } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
 import { TextField } from '@/src/components/ui/TextField';
-import { ErrorView, LoadingView } from '@/src/components/ui/StateViews';
+import { AppText } from '@/src/components/ui/AppText';
+import { Badge } from '@/src/components/ui/Badge';
+import { CategoryLabel } from '@/src/components/expenses/CategoryIcon';
+import { ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
 import { invalidateExpenseQueries } from '@/src/features/expenses/invalidate';
 import { formatMoney } from '@/src/utils/format';
 import { ApiError } from '@/src/types/api';
+import { space } from '@/src/theme/tokens';
 
 export default function ExpenseDetailScreen() {
   const { id, groupId: groupIdParam } = useLocalSearchParams<{ id: string; groupId?: string }>();
@@ -72,7 +77,13 @@ export default function ExpenseDetailScreen() {
       Alert.alert('Request failed', e instanceof ApiError ? e.detail : String(e)),
   });
 
-  if (expenseQuery.isLoading) return <LoadingView />;
+  if (expenseQuery.isLoading) {
+    return (
+      <Screen withHeader>
+        <ListSkeleton rows={4} />
+      </Screen>
+    );
+  }
   if (expenseQuery.isError || !expenseQuery.data) {
     return (
       <ErrorView
@@ -94,30 +105,28 @@ export default function ExpenseDetailScreen() {
     <>
       <Stack.Screen options={{ title: expense.description, headerShown: true }} />
       <Screen withHeader scroll keyboard={requestOpen && !isOwner}>
-        <Card style={{ gap: 8 }}>
+        <Card elevated="md" style={{ gap: 8 }}>
           <View style={styles.titleRow}>
-            <Text style={{ color: t.text, fontSize: 22, fontWeight: '800', flex: 1 }}>
+            <AppText variant="title" style={{ flex: 1 }}>
               {expense.description}
-            </Text>
-            {expense.is_negative ? (
-              <Text style={[styles.badge, { backgroundColor: '#fef3c7', color: '#b45309' }]}>
-                REFUND
-              </Text>
-            ) : null}
+            </AppText>
+            {expense.is_negative ? <Badge label="REFUND" tone="warning" /> : null}
           </View>
-          <Text style={{ color: t.text, fontSize: 28, fontWeight: '800' }}>
+          <AppText variant="display" style={{ fontSize: 28 }}>
             {formatMoney(expense.total_amount, currency)}
-          </Text>
-          <Text style={{ color: t.textMuted }}>
+          </AppText>
+          <View style={{ marginTop: 4 }}>
+            <CategoryLabel category={expense.category} size={32} />
+          </View>
+          <AppText muted variant="bodySm">
             {expense.date}
-            {expense.category ? ` · ${expense.category}` : ''}
             {` · ${expense.split_type}`}
-          </Text>
+          </AppText>
           {expense.original_currency !== currency ? (
-            <Text style={{ color: t.textMuted }}>
+            <AppText muted variant="caption">
               Original {formatMoney(expense.original_amount, expense.original_currency)} @{' '}
               {expense.fx_rate}
-            </Text>
+            </AppText>
           ) : null}
           {Math.abs(myShare) > 0.005 ? (
             <View
@@ -126,13 +135,13 @@ export default function ExpenseDetailScreen() {
                 { borderTopColor: t.cardBorder, backgroundColor: t.brand50 },
               ]}
             >
-              <Text style={{ color: t.textMuted, fontSize: 12 }}>
+              <AppText muted variant="caption">
                 Your share: {formatMoney(String(myShare), currency)}
-              </Text>
-              <Text
+              </AppText>
+              <AppText
+                variant="caption"
                 style={{
                   color: myNet >= 0 ? t.positive : t.negative,
-                  fontSize: 12,
                   fontWeight: '700',
                 }}
               >
@@ -141,54 +150,54 @@ export default function ExpenseDetailScreen() {
                   : myNet > 0
                     ? `you're owed ${formatMoney(String(myNet), currency)}`
                     : `you owe ${formatMoney(String(Math.abs(myNet)), currency)}`}
-              </Text>
+              </AppText>
             </View>
           ) : null}
         </Card>
 
-        <Text style={[styles.section, { color: t.text }]}>Paid by</Text>
-        <Card>
+        <AppText variant="titleSm" style={styles.section}>
+          Paid by
+        </AppText>
+        <Card elevated="sm">
           {Object.entries(expense.paid_by).map(([uid, amt]) => {
             const member = group?.members.find((m) => String(m.id) === uid);
             return (
               <View key={uid} style={styles.row}>
-                <Text style={{ color: t.text }}>
+                <AppText>
                   {member?.name || `User ${uid}`}
                   {Number(uid) === user?.id ? ' (you)' : ''}
-                </Text>
-                <Text style={{ color: t.text, fontWeight: '700' }}>
-                  {formatMoney(amt, currency)}
-                </Text>
+                </AppText>
+                <AppText style={{ fontWeight: '700' }}>{formatMoney(amt, currency)}</AppText>
               </View>
             );
           })}
         </Card>
 
-        <Text style={[styles.section, { color: t.text }]}>Split</Text>
-        <Card>
+        <AppText variant="titleSm" style={styles.section}>
+          Split
+        </AppText>
+        <Card elevated="sm">
           {Object.entries(expense.split_amounts).map(([uid, amt]) => {
             const member = group?.members.find((m) => String(m.id) === uid);
             const raw = expense.split_raw?.[uid];
             return (
               <View key={uid} style={styles.row}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ color: t.text }}>
+                  <AppText>
                     {member?.name || `User ${uid}`}
                     {Number(uid) === user?.id ? ' (you)' : ''}
-                  </Text>
+                  </AppText>
                   {raw && expense.split_type !== 'equal' ? (
-                    <Text style={{ color: t.textMuted, fontSize: 11 }}>
+                    <AppText muted variant="caption">
                       {expense.split_type === 'percentage'
                         ? `${raw}%`
                         : expense.split_type === 'shares'
                           ? `${raw} shares`
                           : `raw ${raw}`}
-                    </Text>
+                    </AppText>
                   ) : null}
                 </View>
-                <Text style={{ color: t.text, fontWeight: '700' }}>
-                  {formatMoney(amt, currency)}
-                </Text>
+                <AppText style={{ fontWeight: '700' }}>{formatMoney(amt, currency)}</AppText>
               </View>
             );
           })}
@@ -221,8 +230,8 @@ export default function ExpenseDetailScreen() {
           )}
 
           {requestOpen && !isOwner ? (
-            <Card style={{ gap: 12 }}>
-              <Text style={{ color: t.text, fontWeight: '700' }}>Propose changes</Text>
+            <Card elevated="sm" style={{ gap: 12 }}>
+              <AppText style={{ fontWeight: '700' }}>Propose changes</AppText>
               <TextField
                 label="Description"
                 value={requestDesc}
@@ -267,7 +276,7 @@ export default function ExpenseDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  section: { fontSize: 16, fontWeight: '700', marginTop: 18, marginBottom: 8 },
+  section: { marginTop: space.xl, marginBottom: space.sm },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -276,20 +285,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  badge: {
-    fontSize: 10,
-    fontWeight: '800',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
   shareStrip: {
     marginTop: 8,
     paddingTop: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: 12,
+    padding: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 8,

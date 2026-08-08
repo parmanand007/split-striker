@@ -6,7 +6,8 @@ import { checkDuplicate, createExpense } from '@/src/api/expenses';
 import { getGroup } from '@/src/api/groups';
 import { useAuthStore } from '@/src/stores/authStore';
 import { Screen } from '@/src/components/ui/Screen';
-import { ErrorView, LoadingView } from '@/src/components/ui/StateViews';
+import { ErrorView } from '@/src/components/ui/StateViews';
+import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
 import { ExpenseForm } from '@/src/features/expenses/ExpenseForm';
 import { invalidateExpenseQueries } from '@/src/features/expenses/invalidate';
 import { ApiError, type ExpenseCreateInput } from '@/src/types/api';
@@ -99,7 +100,13 @@ export default function CreateExpenseScreen() {
   if (!Number.isFinite(groupId)) {
     return <ErrorView message="Missing group" />;
   }
-  if (groupQuery.isLoading) return <LoadingView />;
+  if (groupQuery.isLoading) {
+    return (
+      <Screen withHeader>
+        <ListSkeleton rows={4} />
+      </Screen>
+    );
+  }
   if (groupQuery.isError || !groupQuery.data || !user) {
     return (
       <ErrorView

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { api } from '../../api/client'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 import Modal from '../ui/Modal'
@@ -12,23 +12,8 @@ export default function CreateGroupModal({ onClose, onCreated }) {
   const [name, setName] = useState('')
   const [currency, setCurrency] = useState('INR')
   const [emoji, setEmoji] = useState('')
-  const [allUsers, setAllUsers] = useState([])
-  const [selectedIds, setSelectedIds] = useState(new Set([currentUser.id]))
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    api.getUsers(currentUser.id).then(setAllUsers).catch(console.error)
-  }, [])
-
-  function toggle(id) {
-    if (id === currentUser.id) return
-    setSelectedIds((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
 
   async function submit(e) {
     e.preventDefault()
@@ -39,7 +24,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
       const group = await api.createGroup({
         name: name.trim(),
         currency,
-        member_ids: [...selectedIds],
+        member_ids: [currentUser.id],
         created_by_id: currentUser.id,
         emoji: emoji || null,
       })
@@ -112,52 +97,11 @@ export default function CreateGroupModal({ onClose, onCreated }) {
           </select>
         </div>
 
-        {/* Members */}
-        <div>
-          <label className={labelCls} style={{ color: 'var(--text-muted, #64748b)' }}>
-            Members <span className="normal-case font-normal opacity-60">({selectedIds.size} selected)</span>
-          </label>
-          <div
-            className="max-h-36 overflow-y-auto rounded-xl p-2 space-y-0.5"
-            style={{ border: '1px solid var(--border, rgba(0,0,0,0.1))', background: 'var(--input-bg, rgba(0,0,0,0.04))' }}
-          >
-            {allUsers.map((u) => {
-              const isMe = u.id === currentUser.id
-              const checked = selectedIds.has(u.id)
-              return (
-                <label
-                  key={u.id}
-                  className={`flex items-center gap-3 px-2 py-2 rounded-lg text-sm cursor-pointer transition-colors select-none ${
-                    isMe ? 'opacity-50 cursor-default' : 'hover:bg-black/5 active:bg-black/10'
-                  }`}
-                >
-                  <div className={`w-4 h-4 rounded flex items-center justify-center border transition-all flex-none ${
-                    checked
-                      ? 'bg-brand-600 border-brand-600'
-                      : 'border-slate-400'
-                  }`}>
-                    {checked && (
-                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                        <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggle(u.id)}
-                    disabled={isMe}
-                    className="sr-only"
-                  />
-                  <span style={{ color: 'var(--text-primary, #0f172a)' }}>
-                    {u.name}
-                    {isMe && <span className="text-xs ml-1 opacity-50">(you)</span>}
-                  </span>
-                </label>
-              )
-            })}
-          </div>
-        </div>
+        {/* Invite note */}
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted, #64748b)' }}>
+          You&apos;ll be added automatically. After creating the group, share an invite link to add
+          others — members can only join by invitation.
+        </p>
 
         {error && (
           <p className="text-red-500 text-sm flex items-center gap-1.5">
