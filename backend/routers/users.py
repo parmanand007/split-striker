@@ -1,8 +1,8 @@
 from collections import defaultdict
 from decimal import Decimal
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
@@ -36,7 +36,25 @@ def create_user(body: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=List[UserOut])
-def list_users(db: Session = Depends(get_db)):
+def list_users(
+    known_to: Optional[int] = Query(None),
+    db: Session = Depends(get_db),
+):
+    if known_to is not None:
+        anchor = db.query(User).filter(User.id == known_to).first()
+        if not anchor:
+            raise HTTPException(404, "User not found.")
+        co_member_ids: set[int] = set()
+        for group in anchor.groups:
+            for member in group.members:
+                if member.id != known_to:
+                    co_member_ids.add(member.id)
+        return (
+            db.query(User)
+            .filter(User.id.in_(co_member_ids))
+            .order_by(User.name)
+            .all()
+        )
     return db.query(User).order_by(User.name).all()
 
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { ArrowRight, CheckCircle2, Loader2, PartyPopper, ToggleLeft, ToggleRight, ChevronLeft } from 'lucide-react'
+import { ArrowRight, CheckCircle2, PartyPopper, ToggleLeft, ToggleRight, ChevronLeft } from 'lucide-react'
+import Spinner from '../ui/Spinner'
 import { api } from '../../api/client'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
 import Modal from '../ui/Modal'
@@ -286,7 +287,7 @@ export default function SettleUpModal({ group, onClose, onSettled }) {
                 disabled={saving || !payAmount || parseFloat(payAmount) <= 0}
                 className="btn-primary w-full py-3 text-base flex items-center justify-center gap-2"
               >
-                {saving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                {saving ? <Spinner size="sm" /> : <CheckCircle2 size={16} />}
                 {saving ? 'Recording…' : `Confirm — ${group.currency} ${parseFloat(payAmount || 0).toFixed(2)}`}
               </button>
             </div>

@@ -9,17 +9,13 @@ import TestSuitePage from './pages/TestSuitePage'
 import InvitePage from './pages/InvitePage'
 import NotFoundPage from './pages/NotFoundPage'
 import Layout from './components/layout/Layout'
+import LogoLoader from './components/ui/LogoLoader'
 
 function ProtectedRoutes() {
   const { currentUser, loading } = useCurrentUser()
   const location = useLocation()
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (loading) return <LogoLoader variant="fullscreen" />
+
   if (!currentUser) {
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/login?next=${next}`} replace />

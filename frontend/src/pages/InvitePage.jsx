@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Users, Clock, CheckCircle2, Loader2, ArrowRight, LogIn, UserPlus } from 'lucide-react'
+import { Users, Clock, CheckCircle2, ArrowRight, LogIn, UserPlus } from 'lucide-react'
+import Spinner from '../components/ui/Spinner'
+import LogoLoader from '../components/ui/LogoLoader'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import Logo from '../components/Logo'
@@ -61,12 +63,7 @@ export default function InvitePage() {
         <div className="bg-white/[0.06] backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
 
           {/* Loading */}
-          {loading && (
-            <div className="flex flex-col items-center py-12 px-6">
-              <Loader2 size={28} className="text-brand-400 animate-spin mb-3" />
-              <p className="text-slate-400 text-sm">Loading invite…</p>
-            </div>
-          )}
+          {loading && <LogoLoader variant="section" text="Loading invite…" />}
 
           {/* Error — expired / invalid */}
           {!loading && error && (
@@ -135,10 +132,7 @@ export default function InvitePage() {
                       bg-gradient-to-r from-brand-600 to-brand-800 hover:from-brand-500 hover:to-brand-700
                       shadow-lg shadow-brand-600/30 active:scale-[0.97] transition-all disabled:opacity-50"
                   >
-                    {joining
-                      ? <Loader2 size={16} className="animate-spin" />
-                      : <ArrowRight size={16} />
-                    }
+                    {joining ? <Spinner size="sm" /> : <ArrowRight size={16} />}
                     {joining ? 'Joining…' : 'Join group'}
                   </button>
                 </>

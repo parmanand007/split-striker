@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ArrowRight, Loader2, User, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { ArrowRight, User, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import Spinner from '../components/ui/Spinner'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import Logo from '../components/Logo'
@@ -214,7 +215,7 @@ export default function UserSelectPage() {
                   flex items-center justify-center gap-2 group mt-1"
               >
                 {busy
-                  ? <Loader2 size={16} className="animate-spin" />
+                  ? <Spinner size="sm" />
                   : mode === 'login'
                   ? <><span>Sign in</span><ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" /></>
                   : <span>Create account</span>

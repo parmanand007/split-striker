@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Link2, Copy, Check, CheckCircle2, XCircle, Clock, Trash2, AlertTriangle, Loader2 } from 'lucide-react'
+import { ArrowLeft, Link2, Copy, Check, CheckCircle2, XCircle, Clock, Trash2, AlertTriangle } from 'lucide-react'
+import Spinner from '../components/ui/Spinner'
+import LogoLoader from '../components/ui/LogoLoader'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 
@@ -38,7 +40,7 @@ export default function GroupSettingsPage() {
       setSimplify(g.simplify_debts)
       setEmoji(g.emoji || '')
     }).catch(() => navigate('/'))
-    api.getUsers().then(setAllUsers).catch(console.error)
+    api.getUsers(currentUser?.id).then(setAllUsers).catch(console.error)
   }, [id])
 
   useEffect(() => {
@@ -133,11 +135,7 @@ export default function GroupSettingsPage() {
     }
   }
 
-  if (!group) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="w-6 h-6 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (!group) return <LogoLoader variant="section" />
 
   const memberIds = new Set(group.members.map(m => m.id))
   const nonMembers = allUsers.filter(u => !memberIds.has(u.id))
@@ -390,7 +388,7 @@ export default function GroupSettingsPage() {
                 disabled={deleteConfirmText !== group.name || deleting}
                 className="btn-danger flex-1 flex items-center justify-center gap-2"
               >
-                {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                {deleting ? <Spinner size="xs" /> : <Trash2 size={14} />}
                 {deleting ? 'Deleting…' : 'Delete'}
               </button>
             </div>

@@ -25,8 +25,9 @@ split-striker/
 ## Running Locally
 
 ```bash
-# Backend (from repo root)
-python3 -m uvicorn backend.main:app --reload --port 8000
+# Backend (from repo root) — activate venv first
+source backend/.venv/bin/activate
+PYTHONPATH=backend python3 -m uvicorn backend.main:app --reload --port 8000
 
 # Frontend (from frontend/)
 npm run dev          # starts on :5173 (proxies /api → :8000)

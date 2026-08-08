@@ -38,6 +38,7 @@ def create_group(body: GroupCreate, db: Session = Depends(get_db)):
 
     db.add(ActivityLog(
         group_id=group.id,
+        actor_user_id=body.created_by_id,
         action_type=ActionType.CREATE,
         entity_type=EntityType.GROUP,
         entity_id=group.id,

@@ -166,7 +166,8 @@ export default function HomePage() {
             <Zap size={22} className="text-brand-500" />
           </div>
           <p className="text-slate-700 dark:text-slate-200 font-semibold">No groups yet</p>
-          <p className="text-slate-400 text-sm mt-1">Create a group using the sidebar to start splitting.</p>
+          <p className="text-slate-400 text-sm mt-1 hidden sm:block">Create a group using the sidebar to start splitting.</p>
+          <p className="text-slate-400 text-sm mt-1 sm:hidden">Tap the menu icon above to create your first group.</p>
         </div>
       )}
 

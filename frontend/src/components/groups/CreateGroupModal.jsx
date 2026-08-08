@@ -18,7 +18,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    api.getUsers().then(setAllUsers).catch(console.error)
+    api.getUsers(currentUser.id).then(setAllUsers).catch(console.error)
   }, [])
 
   function toggle(id) {

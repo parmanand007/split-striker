@@ -17,7 +17,7 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
   const isEditing = !!expense
 
   const [desc, setDesc] = useState(expense?.description || '')
-  const [amount, setAmount] = useState(expense ? expense.original_amount : '')
+  const [amount, setAmount] = useState(expense ? String(parseFloat(expense.original_amount)) : '')
   const [currency, setCurrency] = useState(expense?.original_currency || group.currency)
   const [fxRate, setFxRate] = useState(expense ? expense.fx_rate : '1')
   const [category, setCategory] = useState(expense?.category || '')
@@ -394,14 +394,14 @@ export default function ExpenseForm({ group, onClose, onSaved, expense }) {
 
         {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 
-        <div className="flex justify-end gap-3 pt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-slate-100">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+          <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-slate-100 text-center sm:text-left">
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50"
+            className="w-full sm:w-auto px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 disabled:opacity-50"
           >
             {saving ? 'Saving…' : isEditing ? 'Save changes' : 'Add expense'}
           </button>

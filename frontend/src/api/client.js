@@ -31,7 +31,7 @@ export const api = {
   // Users (legacy / internal)
   loginByEmail: (email) => req('POST', '/users/login', { email }),
   createUser: (name, email) => req('POST', '/users', { name, email }),
-  getUsers: () => req('GET', '/users'),
+  getUsers: (knownTo) => req('GET', knownTo != null ? `/users?known_to=${knownTo}` : '/users'),
   getUser: (id) => req('GET', `/users/${id}`),
   getUserSummary: (id) => req('GET', `/users/${id}/summary`),
   getUserActivity: (id) => req('GET', `/users/${id}/activity`),

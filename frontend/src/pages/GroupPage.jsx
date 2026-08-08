@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Settings, Plus, HandCoins, FilePen, X, Loader2 } from 'lucide-react'
+import { Settings, Plus, HandCoins, FilePen, X } from 'lucide-react'
+import Spinner from '../components/ui/Spinner'
 import { api } from '../api/client'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 import ExpenseForm from '../components/expenses/ExpenseForm'
@@ -108,7 +109,7 @@ function RequestEditModal({ expense, group, onClose }) {
               disabled={submitting}
               className="btn-primary w-full py-2.5 flex items-center justify-center gap-2"
             >
-              {submitting ? <Loader2 size={15} className="animate-spin" /> : <FilePen size={15} />}
+              {submitting ? <Spinner size="xs" /> : <FilePen size={15} />}
               {submitting ? 'Sending…' : 'Send request to owner'}
             </button>
           </form>
@@ -144,6 +145,7 @@ export default function GroupPage() {
     setBalances(b)
     setActivity(a)
     setLoading(false)
+    window.dispatchEvent(new Event('expense-updated'))
   }
 
   useEffect(() => { reload() }, [id])
@@ -159,11 +161,11 @@ export default function GroupPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-5 animate-slide-up">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            {group.emoji && <span className="text-2xl">{group.emoji}</span>}
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{group.name}</h1>
+            {group.emoji && <span className="text-2xl flex-none">{group.emoji}</span>}
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 truncate">{group.name}</h1>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-400">
             <span>{group.currency}</span>
@@ -173,7 +175,7 @@ export default function GroupPage() {
             {isOwner && <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-md">owner</span>}
           </div>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-none">
           {!group.archived && isMember && (
             <>
               <button onClick={() => setShowSettle(true)} className="btn-secondary flex items-center gap-1.5 text-sm">

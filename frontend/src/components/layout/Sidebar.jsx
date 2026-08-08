@@ -62,8 +62,13 @@ export default function Sidebar({ onClose }) {
 
   useEffect(() => {
     if (!currentUser) return
-    api.getGroups().then(setGroups).catch(console.error)
-    api.getUserSummary(currentUser.id).then(setSummary).catch(console.error)
+    const refresh = () => {
+      api.getGroups().then(setGroups).catch(console.error)
+      api.getUserSummary(currentUser.id).then(setSummary).catch(console.error)
+    }
+    refresh()
+    window.addEventListener('expense-updated', refresh)
+    return () => window.removeEventListener('expense-updated', refresh)
   }, [currentUser, location.pathname])
 
   useEffect(() => {

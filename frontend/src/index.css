@@ -434,6 +434,59 @@ header button { min-height: 44px; min-width: 44px; }
 .logo-icon-breathe   { animation: logo-breathe 3.2s ease-in-out infinite; }
 .logo-bolt-strike    { animation: bolt-strike 5s ease-in-out infinite; }
 
+/* ─── Loader system ─── */
+@keyframes loader-ring {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(2.0); opacity: 0;   }
+}
+@keyframes loader-dot {
+  0%,80%,100% { transform: translateY(0)   scale(0.55); opacity: 0.35; }
+  40%          { transform: translateY(-5px) scale(1);   opacity: 1;    }
+}
+@keyframes loader-bolt-flash {
+  0%,60%,100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)) brightness(1);
+  }
+  68% {
+    transform: scale(1.35) rotate(-8deg);
+    filter: drop-shadow(0 0 12px rgba(255,255,255,1)) brightness(2.2);
+  }
+  76% {
+    transform: scale(0.88) rotate(4deg);
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)) brightness(0.85);
+  }
+  84% {
+    transform: scale(1.15) rotate(-3deg);
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) brightness(1.5);
+  }
+}
+@keyframes loader-icon-breathe-fast {
+  0%,100% {
+    transform: scale(1);
+    box-shadow: 0 4px 18px rgb(var(--brand-500)/0.50), inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 8px 36px rgb(var(--brand-400)/0.80), 0 0 56px rgb(var(--brand-300)/0.25), inset 0 1px 0 rgba(255,255,255,0.22);
+  }
+}
+/* Button/inline spinner — tiny fast flash */
+@keyframes btn-bolt-flash {
+  0%,50%,100% { transform: scale(1);    filter: brightness(1);   }
+  25%          { transform: scale(1.25); filter: brightness(1.8) drop-shadow(0 0 4px rgba(255,255,255,0.9)); }
+}
+
+.loader-ring          { animation: loader-ring 1.9s cubic-bezier(0.215,0.61,0.355,1) infinite; }
+.loader-ring-2        { animation: loader-ring 1.9s cubic-bezier(0.215,0.61,0.355,1) 0.65s infinite; }
+.loader-dot           { animation: loader-dot 1.15s ease-in-out infinite; }
+.loader-dot-1         { animation-delay: 0s; }
+.loader-dot-2         { animation-delay: 0.18s; }
+.loader-dot-3         { animation-delay: 0.36s; }
+.loader-bolt          { animation: loader-bolt-flash 1.8s ease-in-out infinite; }
+.loader-icon-breathe  { animation: loader-icon-breathe-fast 1.6s ease-in-out infinite; }
+.btn-spinner          { animation: btn-bolt-flash 0.75s ease-in-out infinite; }
+
 /* "Split Striker" shimmer — uses gradient text so it must be white-on-dark */
 .logo-wordmark {
   background: linear-gradient(

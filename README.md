@@ -1,15 +1,22 @@
-# Split Striker
+# Split Striker Wise
 
 A full-featured expense-splitting app — Splitwise mechanics rebuilt from scratch with careful attention to the edge cases that make real money-splitting apps hard.
 
 ## Quick Start
 
+All commands run from the **repo root** (`split-striker/`).
+
 ### Backend
 
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+# Activate the virtual environment first
+source backend/.venv/bin/activate
+
+# Install dependencies (first time only)
+python3 -m pip install -r backend/requirements.txt
+
+# Start the server
+PYTHONPATH=backend python3 -m uvicorn backend.main:app --reload --port 8000
 ```
 
 API docs: http://localhost:8000/docs
@@ -28,9 +35,10 @@ The Vite dev server proxies `/api/*` to `http://localhost:8000`.
 
 ```bash
 cd mobile
-cp .env.example .env
+cp .env.example .env   # then set EXPO_PUBLIC_API_BASE_URL
 npm install
-npm start             # then press a / i, or scan QR with Expo Go
+npx expo start --web   # browser preview at http://localhost:8081
+# or: npx expo start   # scan QR with Expo Go on your phone
 ```
 
 For emulators and phones, run the backend with `--host 0.0.0.0`. Prefer `EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api` locally (Android emulator is rewritten to `10.0.2.2`). Physical devices need your LAN IP.
@@ -40,11 +48,14 @@ Full mobile docs: [`mobile/README.md`](mobile/README.md) (env vars, Android/iOS 
 ### Tests
 
 ```bash
-cd backend
-python -m pytest tests/ -v
+# Backend (run from repo root)
+source backend/.venv/bin/activate
+python3 -m pytest backend/tests/ -v
 
+# Frontend
 cd frontend && npm run test:run
 
+# Mobile
 cd mobile && npm test && npm run typecheck && npm run lint
 ```
 

@@ -21,18 +21,22 @@ function timeAgo(iso) {
 }
 
 function activityText(log) {
-  const meta = ACTION_META[log.action_type] || { label: log.action_type }
   const actor = log.actor_name || 'Someone'
   const details = log.details || {}
+  const isGroup = log.entity_type === 'group'
+
+  let verb = (ACTION_META[log.action_type] || { label: log.action_type }).label
+  if (isGroup && log.action_type === 'create') verb = 'created the group'
 
   let subject = ''
   if (log.action_type === 'create' && details.description) subject = `"${details.description}"`
+  else if (log.action_type === 'create' && isGroup && details.name) subject = `"${details.name}"`
   else if (log.action_type === 'edit' && details.description) subject = `"${details.description}"`
   else if (log.action_type === 'delete' && details.description) subject = `"${details.description}"`
   else if (log.action_type === 'payment' && details.amount) subject = `${details.amount} ${details.currency || ''} → ${details.to_user || ''}`
   else if (log.action_type === 'edit_request' && details.expense) subject = `for "${details.expense}"`
 
-  return { actor, verb: meta.label, subject }
+  return { actor, verb, subject }
 }
 
 export default function ActivityFeed({ logs }) {
