@@ -103,9 +103,16 @@ export default function WelcomeScreen() {
         <Button
           title="Create your free account →"
           variant="marketing"
+          testID="welcome-signup"
           onPress={() => router.push('/(auth)/signup')}
         />
-        <Pressable onPress={() => router.push('/(auth)/login')} style={styles.signIn}>
+        <Pressable
+          testID="welcome-login"
+          accessibilityRole="button"
+          accessibilityLabel="Already have an account? Sign in"
+          onPress={() => router.push('/(auth)/login')}
+          style={styles.signIn}
+        >
           <Text style={styles.signInText}>Already have an account? Sign in</Text>
         </Pressable>
       </View>

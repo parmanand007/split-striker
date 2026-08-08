@@ -39,7 +39,7 @@ export default function GroupsScreen() {
 
   if (groupsQuery.isLoading) {
     return (
-      <Screen>
+      <Screen inTabs>
         <GroupListSkeleton />
       </Screen>
     );
@@ -66,6 +66,7 @@ export default function GroupsScreen() {
 
   return (
     <Screen
+      inTabs
       scroll
       refreshing={groupsQuery.isRefetching || summaryQuery.isRefetching}
       onRefresh={() => {

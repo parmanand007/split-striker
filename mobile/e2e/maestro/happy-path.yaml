@@ -1,0 +1,91 @@
+appId: com.splitstriker.app
+---
+- launchApp:
+    clearState: true
+# Connect to Metro on simulator loopback (dev-client launcher)
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Enter URL manually"
+    commands:
+      - tapOn: "Enter URL manually"
+      - tapOn:
+          optional: true
+          text: ".*"
+      - eraseText
+      - inputText: "http://127.0.0.1:8081"
+      - tapOn:
+          text: "Connect"
+          optional: true
+      - tapOn:
+          text: "Go"
+          optional: true
+- runFlow:
+    when:
+      visible: "http://127.0.0.1:8081"
+    commands:
+      - tapOn: "http://127.0.0.1:8081"
+- extendedWaitUntil:
+    visible: "Split bills"
+    timeout: 45000
+- scrollUntilVisible:
+    element: "Create your free account"
+    direction: DOWN
+    timeout: 20000
+    visibilityPercentage: 50
+- tapOn: "Create your free account"
+- assertVisible: "Create account"
+- tapOn: "Full name"
+- inputText: "E2E iOS User"
+- tapOn: "you@example.com"
+- inputText: "e2e_maestro_ios2@test.com"
+- tapOn:
+    text: "Password"
+    index: 1
+- inputText: "testpass123"
+- hideKeyboard
+- tapOn: "Create free account"
+- extendedWaitUntil:
+    visible: "E2E iOS User"
+    timeout: 30000
+- assertVisible: "E2E iOS User"
+- assertVisible: "No groups yet"
+- tapOn: "Create group"
+- assertVisible: "Group name"
+- tapOn: "Manali trip"
+- inputText: "Goa Trip E2E"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: "Create group"
+    direction: DOWN
+    visibilityPercentage: 50
+- tapOn:
+    text: "Create group"
+- extendedWaitUntil:
+    visible: "Goa Trip E2E"
+    timeout: 20000
+- assertVisible: "Goa Trip E2E"
+- tapOn: "Add expense"
+- extendedWaitUntil:
+    visible: "Description"
+    timeout: 15000
+- tapOn: "Description"
+- inputText: "Beach dinner"
+- tapOn: "Amount"
+- inputText: "1200"
+- hideKeyboard
+- scrollUntilVisible:
+    element: "Save expense"
+    direction: DOWN
+    visibilityPercentage: 50
+    timeout: 10000
+- tapOn: "Save expense"
+- extendedWaitUntil:
+    visible: "Beach dinner"
+    timeout: 20000
+- assertVisible: "Beach dinner"

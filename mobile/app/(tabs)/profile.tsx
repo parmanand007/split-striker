@@ -27,7 +27,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Screen scroll>
+    <Screen inTabs scroll>
       <Text style={[styles.title, { color: t.text }]}>Profile</Text>
 
       <Card style={{ marginBottom: 16 }}>

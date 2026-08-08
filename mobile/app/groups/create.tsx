@@ -109,6 +109,7 @@ export default function CreateGroupScreen() {
           name="name"
           render={({ field: { onChange, value } }) => (
             <TextField
+              testID="group-name"
               label="Group name"
               value={value}
               onChangeText={onChange}
@@ -214,6 +215,7 @@ export default function CreateGroupScreen() {
         </View>
 
         <Button
+          testID="group-create-submit"
           title={
             memberIds.length
               ? `Create group · ${memberIds.length + 1} members`

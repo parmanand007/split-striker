@@ -33,7 +33,12 @@ export default function ActivityScreen() {
   const logs = query.data ?? [];
 
   return (
-    <Screen scroll refreshing={query.isRefetching} onRefresh={() => void query.refetch()}>
+    <Screen
+      inTabs
+      scroll
+      refreshing={query.isRefetching}
+      onRefresh={() => void query.refetch()}
+    >
       <Text style={[styles.title, { color: t.text }]}>Activity</Text>
       {logs.length === 0 ? (
         <EmptyView

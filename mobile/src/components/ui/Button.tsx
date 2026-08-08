@@ -8,6 +8,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { MARKETING } from '@/src/theme/themes';
+import { fonts } from '@/src/theme/typography';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'marketing';
 
@@ -18,6 +19,7 @@ interface Props {
   loading?: boolean;
   disabled?: boolean;
   style?: ViewStyle;
+  testID?: string;
 }
 
 export function Button({
@@ -27,6 +29,7 @@ export function Button({
   loading,
   disabled,
   style,
+  testID,
 }: Props) {
   const t = useThemeStore((s) => s.tokens);
   const isDisabled = disabled || loading;
@@ -34,7 +37,9 @@ export function Button({
   if (variant === 'marketing') {
     return (
       <Pressable
+        testID={testID}
         accessibilityRole="button"
+        accessibilityLabel={title}
         onPress={onPress}
         disabled={isDisabled}
         style={({ pressed }) => [
@@ -56,7 +61,7 @@ export function Button({
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={[styles.label, { color: '#fff', fontFamily: 'Inter_700Bold' }]}>
+            <Text style={[styles.label, { color: '#fff', fontFamily: fonts.bold }]}>
               {title}
             </Text>
           )}
@@ -85,7 +90,9 @@ export function Button({
 
   return (
     <Pressable
+      testID={testID}
       accessibilityRole="button"
+      accessibilityLabel={title}
       onPress={onPress}
       disabled={isDisabled}
       style={({ pressed }) => [
@@ -105,7 +112,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={color} />
       ) : (
-        <Text style={[styles.label, { color, fontFamily: 'Inter_700Bold' }]}>{title}</Text>
+        <Text style={[styles.label, { color, fontFamily: fonts.bold }]}>{title}</Text>
       )}
     </Pressable>
   );

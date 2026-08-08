@@ -79,6 +79,7 @@ export default function SignupScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextField
                 dark
+                testID="signup-name"
                 label="Name"
                 autoComplete="name"
                 textContentType="name"
@@ -99,6 +100,7 @@ export default function SignupScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextField
                 dark
+                testID="signup-email"
                 label="Email"
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -121,6 +123,7 @@ export default function SignupScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextField
                 dark
+                testID="signup-password"
                 label="Password"
                 secureTextEntry
                 autoComplete="new-password"
@@ -142,6 +145,7 @@ export default function SignupScreen() {
           <Button
             title="Create free account →"
             variant="marketing"
+            testID="signup-submit"
             loading={busy}
             onPress={onSubmit}
           />

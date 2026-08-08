@@ -23,6 +23,8 @@ interface Props {
   edges?: Edge[];
   /** Skip top inset when a native stack header is already shown. */
   withHeader?: boolean;
+  /** Tab screens: skip bottom inset — tab bar already owns the home indicator. */
+  inTabs?: boolean;
   keyboard?: boolean;
   /** Extra offset for KeyboardAvoidingView under a header. */
   keyboardOffset?: number;
@@ -36,6 +38,7 @@ export function Screen({
   style,
   edges,
   withHeader,
+  inTabs,
   keyboard,
   keyboardOffset,
 }: Props) {
@@ -45,7 +48,9 @@ export function Screen({
     edges ??
     (withHeader
       ? ['bottom', 'left', 'right']
-      : ['top', 'left', 'right', 'bottom']);
+      : inTabs
+        ? ['top', 'left', 'right']
+        : ['top', 'left', 'right', 'bottom']);
 
   const body = scroll ? (
     <ScrollView
@@ -87,5 +92,6 @@ export function Screen({
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 32, flexGrow: 1 },
+  // Tighter padding — large gaps on iPhone came from 16 + card 20 + section margins.
+  scroll: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24 },
 });

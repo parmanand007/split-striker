@@ -29,7 +29,7 @@ export default function HomeScreen() {
 
   if (!dash.user || dash.loading) {
     return (
-      <Screen>
+      <Screen inTabs>
         <HomeSkeleton />
       </Screen>
     );
@@ -49,12 +49,21 @@ export default function HomeScreen() {
   const primaryGroup: Group | undefined = dash.groups[0];
 
   return (
-    <Screen scroll refreshing={dash.refreshing} onRefresh={() => void dash.refresh()}>
+    <Screen
+      inTabs
+      scroll
+      refreshing={dash.refreshing}
+      onRefresh={() => void dash.refresh()}
+    >
       {/* Header */}
-      <View style={styles.headerRow}>
+      <View style={styles.headerRow} testID="home-header">
         <View style={{ flex: 1 }}>
           <Text style={[styles.greeting, { color: t.textMuted }]}>{greeting}</Text>
-          <Text style={[styles.name, { color: t.text }]} numberOfLines={1}>
+          <Text
+            style={[styles.name, { color: t.text }]}
+            numberOfLines={1}
+            testID="home-user-name"
+          >
             {dash.user.name}
           </Text>
         </View>
@@ -171,6 +180,7 @@ export default function HomeScreen() {
             title="Create group"
             onPress={() => router.push('/groups/create')}
             style={{ marginTop: 14, alignSelf: 'stretch' }}
+            testID="home-create-group"
           />
         </Card>
       ) : (
@@ -208,7 +218,7 @@ export default function HomeScreen() {
                       {group.name}
                     </Text>
                     <Text style={{ color: t.textMuted, fontSize: 12 }}>
-                      {group.members.length} members · {currency}
+                      {(group.members?.length ?? 0)} members · {currency}
                     </Text>
                   </View>
                   <Text
@@ -423,34 +433,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 12,
   },
-  greeting: { fontSize: 14, fontWeight: '600' },
-  name: { fontSize: 28, fontWeight: '800', marginTop: 2 },
+  greeting: { fontSize: 13, fontWeight: '600' },
+  name: { fontSize: 24, fontWeight: '800', marginTop: 2 },
   netBox: { alignItems: 'flex-end', maxWidth: '42%' },
   netLabel: { fontSize: 11, fontWeight: '700', marginBottom: 2 },
-  netValue: { fontSize: 16, fontWeight: '800' },
-  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
-  statCard: { flex: 1, minHeight: 110 },
-  statLabel: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
-  statValue: { fontSize: 18, fontWeight: '800', marginTop: 10 },
-  statSub: { fontSize: 11, marginTop: 8 },
-  actions: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  netValue: { fontSize: 15, fontWeight: '800' },
+  statsRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  statCard: { flex: 1, minHeight: 96, paddingVertical: 12 },
+  statLabel: { fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
+  statValue: { fontSize: 17, fontWeight: '800', marginTop: 6 },
+  statSub: { fontSize: 11, marginTop: 6 },
+  actions: { flexDirection: 'row', gap: 6, marginBottom: 12 },
   quickAction: {
     flex: 1,
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    borderRadius: 14,
+    gap: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 2,
+    borderRadius: 12,
     borderWidth: 1,
-    minHeight: 72,
+    minHeight: 64,
   },
   quickIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -458,55 +468,55 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
-    marginTop: 8,
+    marginBottom: 6,
+    marginTop: 10,
   },
-  section: { fontSize: 16, fontWeight: '700' },
+  section: { fontSize: 15, fontWeight: '700' },
   emptyCard: {
     alignItems: 'center',
-    paddingVertical: 28,
-    borderWidth: 2,
-    marginBottom: 8,
+    paddingVertical: 20,
+    borderWidth: 1.5,
+    marginBottom: 4,
   },
   emptyIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   emptyTitle: { fontSize: 16, fontWeight: '700' },
-  emptyBody: { fontSize: 13, textAlign: 'center', marginTop: 6, paddingHorizontal: 12 },
+  emptyBody: { fontSize: 13, textAlign: 'center', marginTop: 4, paddingHorizontal: 8 },
   groupRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    minHeight: 64,
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 2,
+    minHeight: 56,
   },
   groupIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  groupIconText: { color: '#fff', fontWeight: '800', fontSize: 15 },
-  groupName: { fontSize: 15, fontWeight: '700' },
-  listRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    minHeight: 60,
-  },
-  expenseDot: {
     width: 36,
     height: 36,
     borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  groupIconText: { color: '#fff', fontWeight: '800', fontSize: 14 },
+  groupName: { fontSize: 14, fontWeight: '700' },
+  listRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 2,
+    minHeight: 52,
+  },
+  expenseDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },

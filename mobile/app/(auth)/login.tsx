@@ -82,6 +82,7 @@ export default function LoginScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextField
                 dark
+                testID="login-email"
                 label="Email"
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -104,6 +105,7 @@ export default function LoginScreen() {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextField
                 dark
+                testID="login-password"
                 label="Password"
                 secureTextEntry
                 autoComplete="password"
@@ -122,7 +124,13 @@ export default function LoginScreen() {
             )}
           />
 
-          <Button title="Sign in →" variant="marketing" loading={busy} onPress={onSubmit} />
+          <Button
+            title="Sign in →"
+            variant="marketing"
+            testID="login-submit"
+            loading={busy}
+            onPress={onSubmit}
+          />
         </View>
       </AuthCard>
 

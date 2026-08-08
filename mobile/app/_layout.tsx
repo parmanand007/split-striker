@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
@@ -19,12 +19,8 @@ import { ApiError } from '@/src/types/api';
 
 void SplashScreen.preventAutoHideAsync();
 
-// Match web: Inter everywhere (RN types omit defaultProps).
-const TextAny = Text as typeof Text & {
-  defaultProps?: { style?: { fontFamily?: string } };
-};
-if (TextAny.defaultProps == null) TextAny.defaultProps = {};
-TextAny.defaultProps.style = { fontFamily: 'Inter_400Regular' };
+// Do NOT set Text.defaultProps.style — on RN New Arch / iOS it can make
+// all Text invisible (blank screens with empty layout gaps).
 
 const queryClient = new QueryClient({
   defaultOptions: {
