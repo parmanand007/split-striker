@@ -19,8 +19,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'com.splitstriker.app',
     infoPlist: {
       NSAppTransportSecurity: {
+        // Dev: allow http://LAN for local FastAPI. Production builds should use HTTPS.
         NSAllowsLocalNetworking: true,
+        ...(allowCleartext ? { NSAllowsArbitraryLoads: true } : {}),
       },
+      NSLocalNetworkUsageDescription:
+        'Split Striker Wise uses your local network to reach the development API and Expo Metro server on your computer.',
     },
   },
   android: {
