@@ -5,10 +5,13 @@ import Modal from '../ui/Modal'
 
 const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'JPY', 'KRW', 'SGD', 'AED']
 
+const EMOJIS = ['🏠', '✈️', '🍕', '🎉', '💼', '🎮', '🏋️', '🚗', '🛒', '⛺', '🎵', '📚']
+
 export default function CreateGroupModal({ onClose, onCreated }) {
   const { currentUser } = useCurrentUser()
   const [name, setName] = useState('')
   const [currency, setCurrency] = useState('INR')
+  const [emoji, setEmoji] = useState('')
   const [allUsers, setAllUsers] = useState([])
   const [selectedIds, setSelectedIds] = useState(new Set([currentUser.id]))
   const [error, setError] = useState('')
@@ -19,7 +22,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
   }, [])
 
   function toggle(id) {
-    if (id === currentUser.id) return // can't remove self
+    if (id === currentUser.id) return
     setSelectedIds((prev) => {
       const next = new Set(prev)
       next.has(id) ? next.delete(id) : next.add(id)
@@ -38,7 +41,7 @@ export default function CreateGroupModal({ onClose, onCreated }) {
         currency,
         member_ids: [...selectedIds],
         created_by_id: currentUser.id,
-        emoji: null,
+        emoji: emoji || null,
       })
       onCreated(group)
     } catch (err) {
@@ -48,55 +51,140 @@ export default function CreateGroupModal({ onClose, onCreated }) {
     }
   }
 
+  const labelCls = 'block text-xs font-semibold uppercase tracking-wider mb-1.5'
+  const inputCls = 'w-full rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all'
+  const inputStyle = {
+    background: 'var(--input-bg, rgba(0,0,0,0.06))',
+    border: '1px solid var(--border, rgba(0,0,0,0.1))',
+    color: 'var(--text-primary, #0f172a)',
+    fontSize: '16px',  // prevents iOS zoom
+  }
+
   return (
-    <Modal title="Create Group" onClose={onClose}>
+    <Modal title="New Group" onClose={onClose}>
       <form onSubmit={submit} className="space-y-4">
+
+        {/* Emoji picker */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Group name</label>
+          <label className={labelCls} style={{ color: 'var(--text-muted, #64748b)' }}>Icon</label>
+          <div className="flex flex-wrap gap-2">
+            {EMOJIS.map((e) => (
+              <button
+                key={e}
+                type="button"
+                onClick={() => setEmoji(emoji === e ? '' : e)}
+                className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all active:scale-90 ${
+                  emoji === e
+                    ? 'ring-2 ring-brand-500 scale-110'
+                    : 'hover:scale-110 opacity-70 hover:opacity-100'
+                }`}
+                style={{ background: 'var(--input-bg, rgba(0,0,0,0.06))' }}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Group name */}
+        <div>
+          <label className={labelCls} style={{ color: 'var(--text-muted, #64748b)' }}>Group name</label>
           <input
             autoFocus
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            onChange={(e) => { setName(e.target.value); setError('') }}
+            className={inputCls}
+            style={inputStyle}
             placeholder="e.g. Goa Trip"
           />
         </div>
+
+        {/* Currency */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Default currency</label>
+          <label className={labelCls} style={{ color: 'var(--text-muted, #64748b)' }}>Currency</label>
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className={inputCls}
+            style={inputStyle}
           >
             {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
           </select>
         </div>
+
+        {/* Members */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Members</label>
-          <div className="max-h-40 overflow-y-auto space-y-1 border border-slate-200 dark:border-slate-600 rounded-lg p-2">
-            {allUsers.map((u) => (
-              <label key={u.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:hover:bg-slate-700/50 rounded px-2 py-1">
-                <input
-                  type="checkbox"
-                  checked={selectedIds.has(u.id)}
-                  onChange={() => toggle(u.id)}
-                  disabled={u.id === currentUser.id}
-                  className="accent-brand-600"
-                />
-                <span className={u.id === currentUser.id ? 'text-slate-400' : ''}>{u.name}{u.id === currentUser.id ? ' (you)' : ''}</span>
-              </label>
-            ))}
+          <label className={labelCls} style={{ color: 'var(--text-muted, #64748b)' }}>
+            Members <span className="normal-case font-normal opacity-60">({selectedIds.size} selected)</span>
+          </label>
+          <div
+            className="max-h-36 overflow-y-auto rounded-xl p-2 space-y-0.5"
+            style={{ border: '1px solid var(--border, rgba(0,0,0,0.1))', background: 'var(--input-bg, rgba(0,0,0,0.04))' }}
+          >
+            {allUsers.map((u) => {
+              const isMe = u.id === currentUser.id
+              const checked = selectedIds.has(u.id)
+              return (
+                <label
+                  key={u.id}
+                  className={`flex items-center gap-3 px-2 py-2 rounded-lg text-sm cursor-pointer transition-colors select-none ${
+                    isMe ? 'opacity-50 cursor-default' : 'hover:bg-black/5 active:bg-black/10'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded flex items-center justify-center border transition-all flex-none ${
+                    checked
+                      ? 'bg-brand-600 border-brand-600'
+                      : 'border-slate-400'
+                  }`}>
+                    {checked && (
+                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggle(u.id)}
+                    disabled={isMe}
+                    className="sr-only"
+                  />
+                  <span style={{ color: 'var(--text-primary, #0f172a)' }}>
+                    {u.name}
+                    {isMe && <span className="text-xs ml-1 opacity-50">(you)</span>}
+                  </span>
+                </label>
+              )
+            })}
           </div>
         </div>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-slate-100">
+
+        {error && (
+          <p className="text-red-500 text-sm flex items-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-red-500 flex-none" />
+            {error}
+          </p>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-1">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-3 rounded-xl text-sm font-medium transition-all active:scale-95"
+            style={{
+              background: 'var(--input-bg, rgba(0,0,0,0.06))',
+              color: 'var(--text-muted, #64748b)',
+              border: '1px solid var(--border, rgba(0,0,0,0.1))',
+            }}
+          >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50"
+            className="flex-1 py-3 rounded-xl text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white
+              shadow-lg shadow-brand-600/25 active:scale-95 transition-all disabled:opacity-40"
           >
             {saving ? 'Creating…' : 'Create group'}
           </button>
