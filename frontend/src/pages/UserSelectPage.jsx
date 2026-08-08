@@ -11,7 +11,7 @@ export default function UserSelectPage() {
   const redirectTo = searchParams.get('next') || searchParams.get('redirect') || '/groups'
   const { login, currentUser } = useCurrentUser()
 
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
+  const [mode, setMode] = useState(searchParams.get('mode') === 'signup' ? 'signup' : 'login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

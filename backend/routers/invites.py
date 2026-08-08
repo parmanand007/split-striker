@@ -9,7 +9,7 @@ from database import get_db
 from dependencies import get_current_user
 from models import Group, GroupInvite, User, ActivityLog, ActionType, EntityType
 
-router = APIRouter(prefix="/api/invite", tags=["invites"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/api/invite", tags=["invites"])
 
 
 class InviteOut(BaseModel):
@@ -27,7 +27,7 @@ class AcceptInviteBody(BaseModel):
     user_id: int
 
 
-@router.post("/groups/{group_id}/create")
+@router.post("/groups/{group_id}/create", dependencies=[Depends(get_current_user)])
 def create_invite(group_id: int, actor_user_id: int, db: Session = Depends(get_db)):
     group = db.query(Group).filter(Group.id == group_id).first()
     if not group:
@@ -113,7 +113,7 @@ def accept_invite(token: str, body: AcceptInviteBody, db: Session = Depends(get_
     return {"message": "Joined successfully", "group_id": group.id}
 
 
-@router.delete("/groups/{group_id}/invite/{token}")
+@router.delete("/groups/{group_id}/invite/{token}", dependencies=[Depends(get_current_user)])
 def deactivate_invite(group_id: int, token: str, db: Session = Depends(get_db)):
     invite = db.query(GroupInvite).filter(
         GroupInvite.token == token, GroupInvite.group_id == group_id
