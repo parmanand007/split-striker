@@ -1,6 +1,7 @@
 """
 Comprehensive API integration tests — every endpoint, every flow.
-Each test gets a fresh in-memory SQLite database.
+Each test gets a fresh isolated in-memory SQLite database.
+The app uses PostgreSQL (DATABASE_URL) in production; tests never touch it.
 Run: pytest backend/tests/ -v
 """
 import sys, os
@@ -16,20 +17,19 @@ from database import Base, get_db
 from dependencies import get_current_user
 from main import app
 
-SQLALCHEMY_TEST_URL = "sqlite:///:memory:"
-_engine = create_engine(
-    SQLALCHEMY_TEST_URL,
+_test_engine = create_engine(
+    "sqlite:///:memory:",
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
 )
-_Session = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
+_Session = sessionmaker(autocommit=False, autoflush=False, bind=_test_engine)
 
 
 @pytest.fixture(autouse=True)
 def fresh_db():
-    Base.metadata.create_all(bind=_engine)
+    Base.metadata.create_all(bind=_test_engine)
     yield
-    Base.metadata.drop_all(bind=_engine)
+    Base.metadata.drop_all(bind=_test_engine)
 
 
 @pytest.fixture
