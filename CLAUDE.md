@@ -6,7 +6,7 @@
 split-striker/
 ├── backend/          FastAPI Python backend
 │   ├── main.py       App entry point, CORS config
-│   ├── database.py   SQLAlchemy setup (SQLite)
+│   ├── database.py   SQLAlchemy setup (PostgreSQL in prod, SQLite locally)
 │   ├── models.py     ORM models
 │   ├── routers/      Route handlers (users, groups, expenses, invites, …)
 │   └── tests/        pytest test suites (test_core.py + test_api.py)
@@ -37,6 +37,13 @@ npm run dev          # starts on :5173 (proxies /api → :8000)
 | Variable | Where | Value |
 |---|---|---|
 | `VITE_API_BASE_URL` | Render frontend build env | `https://split-striker.onrender.com/api` |
+| `DATABASE_URL` | Render backend env | Neon PostgreSQL connection string (see Render dashboard) |
+
+## Database
+
+- **Production**: Neon PostgreSQL (`DATABASE_URL` env var on Render backend)
+- **Local dev**: SQLite (`./split-striker.db`) — used automatically when `DATABASE_URL` is not set
+- Data persists across all deploys via Neon — never reset the DB without asking the user
 
 ## Tests
 
