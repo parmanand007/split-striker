@@ -1,6 +1,6 @@
 {
-  "name": "Split Striker",
-  "short_name": "Split Striker",
+  "name": "Split Striker Wise",
+  "short_name": "Split Striker Wise",
   "description": "Free expense-splitting app for friends, roommates, and travel groups. Track who owes what and settle up in seconds.",
   "start_url": "/",
   "scope": "/",
@@ -25,7 +25,7 @@
     {
       "name": "Sign In",
       "short_name": "Sign In",
-      "description": "Sign in to your Split Striker account",
+      "description": "Sign in to your Split Striker Wise account",
       "url": "/login",
       "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
     }

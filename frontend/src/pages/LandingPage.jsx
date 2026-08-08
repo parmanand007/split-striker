@@ -337,7 +337,7 @@ export default function LandingPage() {
 
             <StepCard n={1} icon={Users} title="Create a group" desc="Set up a group for your trip, apartment, or any shared expense. Invite friends with a link." delay={0} />
             <StepCard n={2} icon={Zap} title="Add expenses" desc="Log expenses as you go. Split equally or custom amounts per person." delay={120} />
-            <StepCard n={3} icon={CheckCircle2} title="Settle up" desc="Split Striker calculates the simplest way to settle — fewer transactions, less hassle." delay={240} />
+            <StepCard n={3} icon={CheckCircle2} title="Settle up" desc="Split Striker Wise calculates the simplest way to settle — fewer transactions, less hassle." delay={240} />
           </div>
         </div>
       </section>
@@ -363,7 +363,7 @@ export default function LandingPage() {
             <FeatureCard
               icon={Zap}
               title="Smart splitting"
-              desc="Split equally, by percentage, or custom amounts. Split Striker handles the math."
+              desc="Split equally, by percentage, or custom amounts. Split Striker Wise handles the math."
               gradient="linear-gradient(135deg, #dc2626, #991b1b)"
               delay={80}
             />
@@ -448,7 +448,7 @@ export default function LandingPage() {
           </Reveal>
           <Reveal delay={160}>
             <p className="text-slate-400 text-lg mb-10">
-              Join Split Striker today — it's free, it's fast, and your friends will thank you.
+              Join Split Striker Wise today — it's free, it's fast, and your friends will thank you.
             </p>
           </Reveal>
           <Reveal delay={240}>
@@ -472,7 +472,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="sm" />
           <p className="text-slate-600 text-sm">
-            Split expenses. Stay friends. © {new Date().getFullYear()} Split Striker
+            Split expenses. Stay friends. © {new Date().getFullYear()} Split Striker Wise
           </p>
           <Link to="/login" className="text-sm text-slate-500 hover:text-white transition-colors">
             Sign in →

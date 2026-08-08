@@ -39,7 +39,7 @@ export default function Logo({ size = 'sm', showText = true, dark = true }) {
             isLg ? 'text-[1.7rem] font-black tracking-tight' : 'text-[1.05rem] font-bold tracking-tight'
           }`}
         >
-          Split Striker
+          Split Striker Wise
         </span>
       )}
     </div>

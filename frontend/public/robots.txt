@@ -1,4 +1,4 @@
-# Split Striker — robots.txt
+# Split Striker Wise — robots.txt
 # https://split-striker-wise.onrender.com
 
 User-agent: *

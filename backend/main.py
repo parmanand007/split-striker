@@ -10,7 +10,7 @@ from routers import invites, edit_requests, auth
 Base.metadata.create_all(bind=engine)
 run_migrations()
 
-app = FastAPI(title="Split Striker API", version="2.0.0")
+app = FastAPI(title="Split Striker Wise API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,

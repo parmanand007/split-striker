@@ -134,7 +134,7 @@ export default function UserSelectPage() {
             ) : (
               <>
                 <h2 className="text-xl font-bold text-white mb-1">Create account</h2>
-                <p className="text-slate-400 text-sm mb-6">Join Split Striker free.</p>
+                <p className="text-slate-400 text-sm mb-6">Join Split Striker Wise free.</p>
               </>
             )}
 
