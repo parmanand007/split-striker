@@ -123,6 +123,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   login: async (user, token, redirectTo) => {
+    setMemoryToken(token);
     await persistSession(token, JSON.stringify(user));
     set({
       user,
@@ -135,6 +136,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: async () => {
+    setMemoryToken(null);
     await clearPersistedSession();
     set({
       user: null,
@@ -164,6 +166,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   handleUnauthorized: async (detail) => {
     // Avoid loops if already cleared
     if (get().status === 'unauthenticated' && !get().token) return;
+    setMemoryToken(null);
     await clearPersistedSession();
     set({
       user: null,

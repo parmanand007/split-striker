@@ -1,19 +1,12 @@
 import { useMemo, useState } from 'react';
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeStore } from '@/src/stores/themeStore';
 import { CURRENCIES, findCurrency, type CurrencyOption } from '@/src/features/currency/currencies';
 import { fonts } from '@/src/theme/typography';
 import { AppText } from './AppText';
 import { shadow } from '@/src/theme/tokens';
+import { GlassBottomSheet } from './GlassBottomSheet';
 
 interface Props {
   label?: string;
@@ -22,6 +15,8 @@ interface Props {
   error?: string;
   /** Extra codes that must appear even if not in the catalog (legacy data). */
   includeCodes?: string[];
+  /** Small pill trigger (flag + code only) for inline placement next to a hero amount. */
+  compact?: boolean;
 }
 
 export function CurrencyPicker({
@@ -30,9 +25,9 @@ export function CurrencyPicker({
   onChange,
   error,
   includeCodes = [],
+  compact,
 }: Props) {
   const t = useThemeStore((s) => s.tokens);
-  const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -66,7 +61,7 @@ export function CurrencyPicker({
 
   return (
     <View>
-      {label ? (
+      {label && !compact ? (
         <AppText muted variant="caption" style={styles.label}>
           {label}
         </AppText>
@@ -76,18 +71,29 @@ export function CurrencyPicker({
         accessibilityLabel={`Currency ${selected.code}`}
         onPress={() => setOpen(true)}
         style={[
-          styles.trigger,
+          compact ? styles.pill : styles.trigger,
           shadow('sm'),
           {
-            backgroundColor: t.cardBg,
-            borderColor: error ? t.danger : t.cardBorder,
+            backgroundColor: compact ? t.brand50 : t.cardBg,
+            borderColor: error ? t.danger : compact ? t.brand100 : t.cardBorder,
           },
         ]}
       >
-        <AppText style={{ flex: 1, fontFamily: fonts.semibold }} numberOfLines={1}>
-          {selected.flag} {selected.code} — {selected.name}
-        </AppText>
-        <Ionicons name="chevron-down" size={18} color={t.textMuted} />
+        {compact ? (
+          <>
+            <AppText style={{ fontFamily: fonts.bold, color: t.brand700 }}>
+              {selected.flag} {selected.code}
+            </AppText>
+            <Ionicons name="chevron-down" size={14} color={t.brand600} />
+          </>
+        ) : (
+          <>
+            <AppText style={{ flex: 1, fontFamily: fonts.semibold }} numberOfLines={1}>
+              {selected.flag} {selected.code} — {selected.name}
+            </AppText>
+            <Ionicons name="chevron-down" size={18} color={t.textMuted} />
+          </>
+        )}
       </Pressable>
       {error ? (
         <AppText style={{ color: t.danger, marginTop: 4 }} variant="caption">
@@ -95,78 +101,66 @@ export function CurrencyPicker({
         </AppText>
       ) : null}
 
-      <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
-        <Pressable style={styles.backdrop} onPress={() => setOpen(false)} />
+      <GlassBottomSheet
+        visible={open}
+        onClose={() => setOpen(false)}
+        title="Select currency"
+        maxHeight={520}
+      >
         <View
           style={[
-            styles.sheet,
-            {
-              backgroundColor: t.cardBg,
-              paddingBottom: Math.max(insets.bottom, 16),
-            },
+            styles.search,
+            { backgroundColor: t.pageBg, borderColor: t.cardBorder },
           ]}
         >
-          <View style={styles.handleRow}>
-            <View style={[styles.handle, { backgroundColor: t.cardBorder }]} />
-          </View>
-          <AppText variant="titleSm" style={{ marginBottom: 10 }}>
-            Select currency
-          </AppText>
-          <View
-            style={[
-              styles.search,
-              { backgroundColor: t.pageBg, borderColor: t.cardBorder },
-            ]}
-          >
-            <Ionicons name="search" size={16} color={t.textMuted} />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Search code or name"
-              placeholderTextColor={t.textMuted}
-              autoCapitalize="none"
-              style={[styles.searchInput, { color: t.text, fontFamily: fonts.regular }]}
-            />
-          </View>
-          <FlatList
-            data={filtered}
-            keyExtractor={(item) => item.code}
-            keyboardShouldPersistTaps="handled"
-            style={{ maxHeight: 360 }}
-            renderItem={({ item }) => {
-              const active = item.code === selected.code;
-              return (
-                <Pressable
-                  onPress={() => {
-                    onChange(item.code);
-                    setOpen(false);
-                    setQuery('');
-                  }}
-                  style={[
-                    styles.row,
-                    {
-                      backgroundColor: active ? t.brand50 : 'transparent',
-                      borderColor: active ? t.brand100 : 'transparent',
-                    },
-                  ]}
-                >
-                  <AppText style={{ flex: 1, fontFamily: fonts.semibold }}>
-                    {item.flag} {item.code} — {item.name}
-                  </AppText>
-                  {active ? (
-                    <Ionicons name="checkmark-circle" size={20} color={t.brand500} />
-                  ) : null}
-                </Pressable>
-              );
-            }}
-            ListEmptyComponent={
-              <AppText muted style={{ padding: 16, textAlign: 'center' }}>
-                No currencies match.
-              </AppText>
-            }
+          <Ionicons name="search" size={16} color={t.textMuted} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search code or name"
+            placeholderTextColor={t.textMuted}
+            autoCapitalize="none"
+            style={[styles.searchInput, { color: t.text, fontFamily: fonts.regular }]}
           />
         </View>
-      </Modal>
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.code}
+          keyboardShouldPersistTaps="handled"
+          style={{ maxHeight: 360 }}
+          renderItem={({ item }) => {
+            const active = item.code === selected.code;
+            return (
+              <Pressable
+                onPress={() => {
+                  onChange(item.code);
+                  setOpen(false);
+                  setQuery('');
+                }}
+                style={[
+                  styles.row,
+                  {
+                    backgroundColor: active ? t.brand50 : 'transparent',
+                    borderColor: active ? t.brand100 : 'transparent',
+                  },
+                ]}
+              >
+                <AppText style={{ flex: 1, fontFamily: fonts.semibold }}>
+                  {item.flag} {item.code} — {item.name}
+                </AppText>
+                {active ? (
+                  <Ionicons name="checkmark-circle" size={20} color={t.brand500} />
+                ) : null}
+              </Pressable>
+            );
+          }}
+          ListEmptyComponent={
+            <AppText muted style={{ padding: 16, textAlign: 'center' }}>
+              No currencies match.
+            </AppText>
+          }
+        />
+      </GlassBottomSheet>
     </View>
   );
 }
@@ -182,16 +176,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  backdrop: { flex: 1, backgroundColor: 'rgba(15,23,42,0.35)' },
-  sheet: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    ...shadow('lg'),
+  pill: {
+    minHeight: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
   },
-  handleRow: { alignItems: 'center', marginBottom: 8 },
-  handle: { width: 40, height: 4, borderRadius: 2 },
   search: {
     flexDirection: 'row',
     alignItems: 'center',

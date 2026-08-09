@@ -93,6 +93,7 @@ export default function EditProfileScreen() {
         () => undefined,
       );
     } catch (e) {
+      console.error('[avatar] upload failed', e);
       Alert.alert(
         'Upload failed',
         e instanceof ApiError ? e.detail : e instanceof Error ? e.message : String(e),
@@ -107,6 +108,7 @@ export default function EditProfileScreen() {
       const uri = await pickProfilePhotoFromLibrary();
       if (uri) await applyAvatar(uri);
     } catch (e) {
+      console.error('[avatar] library pick failed', e);
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes('permission denied')) {
         Alert.alert('Could not open library', msg);
@@ -119,6 +121,7 @@ export default function EditProfileScreen() {
       const uri = await takeProfilePhoto();
       if (uri) await applyAvatar(uri);
     } catch (e) {
+      console.error('[avatar] camera capture failed', e);
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes('permission denied')) {
         Alert.alert('Could not open camera', msg);

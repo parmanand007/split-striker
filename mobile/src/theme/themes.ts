@@ -204,8 +204,8 @@ export const DEFAULT_THEME: ThemeId = 'maroon';
  * (fixed maroon dark canvas, not theme-switched).
  */
 export const MARKETING = {
-  bg: '#080d14',
-  bgMid: '#0e1825',
+  bg: '#2c0810',
+  bgMid: '#4a1220',
   card: 'rgba(255,255,255,0.07)',
   cardSolid: '#111827',
   cardBorder: 'rgba(255,255,255,0.10)',

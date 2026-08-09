@@ -37,7 +37,7 @@ export function AuthShell({
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
       <LinearGradient
-        colors={[MARKETING.bg, MARKETING.bgMid, '#120818', MARKETING.bg]}
+        colors={[MARKETING.bg, MARKETING.bgMid, '#1c0509', MARKETING.bg]}
         locations={[0, 0.35, 0.7, 1]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}

@@ -57,15 +57,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-secure-store',
-    [
-      'expo-image-picker',
-      {
-        photosPermission:
-          'Allow Split Striker Wise to access your photos to set a profile picture.',
-        cameraPermission:
-          'Allow Split Striker Wise to use the camera for your profile picture.',
-      },
-    ],
+    // Permission strings are set once, above, under ios.infoPlist —
+    // duplicating different text here is overridden and just confusing.
+    'expo-image-picker',
     [
       'expo-build-properties',
       {

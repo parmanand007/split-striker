@@ -1,3 +1,4 @@
+import { File, UploadTask, UploadType } from 'expo-file-system';
 import { getMemoryToken } from '@/src/stores/tokenStore';
 import { API_BASE_URL } from '@/src/config/env';
 import { resolveMediaUrl } from '@/src/utils/mediaUrl';
@@ -22,24 +23,26 @@ function formatDetail(detail: unknown, fallback: string): string {
 }
 
 export async function uploadUserAvatar(userId: number, uri: string): Promise<User> {
+  // Expo SDK 57's global `fetch` only accepts Blob/File form parts — it no longer
+  // supports React Native's classic `{uri, name, type}` FormData shape (throws
+  // "Unsupported FormDataPart implementation"). expo-file-system's UploadTask
+  // uploads a local file URI natively, sidestepping fetch's FormData entirely.
   const token = getMemoryToken();
-  const form = new FormData();
-  form.append('file', {
-    uri,
-    name: 'avatar.jpg',
-    type: 'image/jpeg',
-  } as unknown as Blob);
 
-  let res: Response;
+  let result: { body: string; status: number };
   try {
-    res = await fetch(`${API_BASE_URL}/users/${userId}/avatar`, {
-      method: 'POST',
+    const file = new File(uri);
+    const task = new UploadTask(file, `${API_BASE_URL}/users/${userId}/avatar`, {
+      httpMethod: 'POST',
+      uploadType: UploadType.MULTIPART,
+      fieldName: 'file',
+      mimeType: 'image/jpeg',
       headers: {
         Accept: 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: form,
     });
+    result = await task.uploadAsync();
   } catch (error) {
     throw new TypeError(
       error instanceof Error
@@ -48,12 +51,22 @@ export async function uploadUserAvatar(userId: number, uri: string): Promise<Use
     );
   }
 
-  if (!res.ok) {
-    const errBody = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new ApiError(res.status, formatDetail(errBody?.detail ?? errBody, res.statusText));
+  const parsedBody = (() => {
+    try {
+      return JSON.parse(result.body);
+    } catch {
+      return { detail: result.body };
+    }
+  })();
+
+  if (result.status < 200 || result.status >= 300) {
+    throw new ApiError(
+      result.status,
+      formatDetail(parsedBody?.detail ?? parsedBody, `Upload failed (${result.status})`),
+    );
   }
 
-  return (await res.json()) as User;
+  return parsedBody as User;
 }
 
 export async function deleteUserAvatar(userId: number): Promise<User> {

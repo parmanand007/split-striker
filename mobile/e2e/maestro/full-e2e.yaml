@@ -1,0 +1,272 @@
+# Full E2E (iOS Simulator + Maestro): signup -> home -> create group ->
+# add expense (no category) -> review expenses -> fix category -> re-verify.
+# Prerequisites: Metro running on :8081, backend on :8000, simulator booted.
+#   maestro test e2e/maestro/full-e2e.yaml -e EMAIL=someone@test.com -e NAME="Some Name"
+appId: com.splitstriker.app
+---
+- launchApp:
+    clearState: true
+- openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 90000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Reload"
+    commands:
+      - tapOn: "Go home"
+- runFlow:
+    when:
+      visible: "Enter URL manually"
+    commands:
+      - openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
+
+# clearState doesn't touch the iOS Keychain, and the JWT session lives in
+# SecureStore (Keychain-backed) — so a previous logged-in user may still be
+# active. Log out explicitly to guarantee a clean slate for signup below.
+- runFlow:
+    when:
+      visible:
+        id: "home-user-name"
+    commands:
+      - extendedWaitUntil:
+          visible: ".*Profile.*"
+          timeout: 20000
+      - tapOn: ".*Profile.*"
+      - extendedWaitUntil:
+          visible: "Log out"
+          timeout: 15000
+      - tapOn: "Log out"
+      - extendedWaitUntil:
+          visible: "Sign out of Split Striker Wise?"
+          timeout: 10000
+      - tapOn:
+          text: "Log out"
+          index: 1
+
+# --- Signup ---
+- extendedWaitUntil:
+    visible: ".*friendships.*"
+    timeout: 90000
+- scrollUntilVisible:
+    element:
+      id: "welcome-signup"
+    direction: DOWN
+    timeout: 25000
+    visibilityPercentage: 30
+    centerElement: true
+- tapOn:
+    id: "welcome-signup"
+- tapOn:
+    id: "signup-name"
+- inputText: "${NAME}"
+- tapOn:
+    id: "signup-email"
+- inputText: "${EMAIL}"
+- tapOn:
+    id: "signup-password"
+# iOS shows a system "Use Strong Password?" suggestion sheet on first focus of a
+# textContentType=newPassword field. It's a separate system process, invisible to
+# the app's accessibility tree, so it can only be dismissed by raw coordinates.
+- tapOn:
+    point: "91%,58%"
+- tapOn:
+    id: "signup-password"
+- inputText: "testpass123"
+- tapOn: "Create account"
+- tapOn:
+    id: "signup-submit"
+- runFlow:
+    when:
+      visible: "Save Password?"
+    commands:
+      - tapOn: "Not Now"
+- extendedWaitUntil:
+    visible:
+      id: "home-user-name"
+    timeout: 45000
+- assertVisible:
+    id: "home-user-name"
+- assertVisible: "${NAME}"
+- assertVisible: "No groups yet"
+
+# --- Create group ---
+- extendedWaitUntil:
+    visible:
+      id: "home-create-group"
+    timeout: 15000
+- tapOn:
+    id: "home-create-group"
+- extendedWaitUntil:
+    visible:
+      id: "group-name"
+    timeout: 15000
+- tapOn:
+    id: "group-name"
+- inputText: "E2E Trip"
+- tapOn: "Members"
+- scrollUntilVisible:
+    element:
+      id: "group-create-submit"
+    direction: DOWN
+    visibilityPercentage: 40
+- tapOn:
+    id: "group-create-submit"
+- extendedWaitUntil:
+    visible: "Group created"
+    timeout: 20000
+- tapOn: "Invite members"
+- extendedWaitUntil:
+    visible: "Invite members"
+    timeout: 15000
+- assertVisible: "1 member"
+
+# Members was reached via router.replace() (not push), so there's no stack
+# entry to pop back to — relaunch (keeping the session) to land back on Home,
+# then open the group from the "By group" list.
+- launchApp:
+    clearState: false
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Reload"
+    commands:
+      - tapOn: "Go home"
+- runFlow:
+    when:
+      visible: "Enter URL manually"
+    commands:
+      - openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
+
+# --- Navigate to the new group's detail screen ---
+# GroupRow flattens its children into one combined accessibility string
+# (e.g. "E, E2E Trip, 1 members · INR, settled, ›") — needs a substring regex.
+- extendedWaitUntil:
+    visible: ".*E2E Trip.*"
+    timeout: 45000
+- tapOn: ".*E2E Trip.*"
+- extendedWaitUntil:
+    visible: "Trip budget"
+    timeout: 15000
+- assertVisible: "E2E Trip"
+- assertVisible: "All settled up"
+
+# --- Add an expense, deliberately with no category ---
+- extendedWaitUntil:
+    visible: "Add expense"
+    timeout: 15000
+- tapOn: "Add expense"
+- extendedWaitUntil:
+    visible:
+      id: "expense-description"
+    timeout: 15000
+- tapOn:
+    id: "expense-description"
+- inputText: "Airport taxi"
+- tapOn:
+    id: "expense-amount"
+- inputText: "500"
+- tapOn: "Amount"
+- scrollUntilVisible:
+    element:
+      id: "expense-submit"
+    direction: DOWN
+    timeout: 15000
+    visibilityPercentage: 40
+- tapOn:
+    id: "expense-submit"
+# ExpenseRow flattens its children into one combined accessibility string —
+# needs a substring regex, same as GroupRow earlier.
+- extendedWaitUntil:
+    visible: ".*Airport taxi.*"
+    timeout: 15000
+- assertVisible: ".*Airport taxi.*"
+- assertVisible: ".*500.00.*"
+
+# Group detail is also a stack screen outside the tabs navigator (no tab
+# bar). The `back` command's edge-swipe gesture isn't reliable in-simulator,
+# so relaunch (keeping the session) to land back on Home/tabs instead.
+- launchApp:
+    clearState: false
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Reload"
+    commands:
+      - tapOn: "Go home"
+- runFlow:
+    when:
+      visible: "Enter URL manually"
+    commands:
+      - openLink: exp+split-striker://expo-development-client/?url=http://127.0.0.1:8081
+- extendedWaitUntil:
+    visible:
+      id: "home-user-name"
+    timeout: 45000
+
+# --- Review expenses: the new expense should be flagged (missing category) ---
+- extendedWaitUntil:
+    visible: ".*Profile.*"
+    timeout: 15000
+- tapOn: ".*Profile.*"
+- extendedWaitUntil:
+    visible: "Review expenses"
+    timeout: 15000
+- tapOn: "Review expenses"
+- extendedWaitUntil:
+    visible: ".*Airport taxi.*"
+    timeout: 15000
+- assertVisible: "Missing category"
+- tapOn: "Review"
+- extendedWaitUntil:
+    visible:
+      id: "expense-description"
+    timeout: 15000
+- assertVisible: "Airport taxi"
+# CategoryField's trigger sets its own accessibilityLabel="Category
+# Uncategorized" (combining both words) — needs a substring regex. Center it
+# (it sits right at the screen edge after scrolling) for a reliable tap.
+- scrollUntilVisible:
+    element:
+      text: ".*Uncategorized.*"
+    direction: DOWN
+    timeout: 15000
+    visibilityPercentage: 40
+    centerElement: true
+- tapOn:
+    text: ".*Uncategorized.*"
+# CategoryTile also flattens (icon + label repeated): "Food & Drink, ..., Food & Drink"
+- extendedWaitUntil:
+    visible: ".*Food & Drink.*"
+    timeout: 10000
+- tapOn: ".*Food & Drink.*"
+- scrollUntilVisible:
+    element:
+      id: "expense-submit"
+    direction: DOWN
+    timeout: 15000
+    visibilityPercentage: 40
+- tapOn:
+    id: "expense-submit"
+- extendedWaitUntil:
+    visible: "Saved"
+    timeout: 15000
+- tapOn: "OK"
+
+# --- Re-check review list: editing lands back on Review expenses directly
+# (edit.tsx does router.back(), not a redirect to tabs) — should now be clear.
+- extendedWaitUntil:
+    visible: "All clear"
+    timeout: 15000
+- assertVisible: "All clear"
+- assertVisible: "No expenses need attention right now."
+- assertNotVisible: ".*Airport taxi.*"

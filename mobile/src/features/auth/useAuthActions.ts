@@ -28,9 +28,13 @@ export function useAuthActions() {
       setError(null);
       try {
         const result = await loginApi(email, password);
+        // Clear the cache before setting the user — loginStore's state update
+        // triggers an immediate redirect to tabs, whose queries start firing
+        // as soon as `user` is set. Clearing after that point can cancel
+        // those freshly-started requests mid-flight (they never retry).
+        queryClient.clear();
         // AuthGate consumes pendingRedirect to avoid racing with login→tabs.
         await loginStore(result.user, result.token, sanitizeRedirect(next));
-        queryClient.clear();
         return true;
       } catch (e) {
         setError(getAuthErrorMessage(e, 'Sign in failed'));
@@ -48,8 +52,10 @@ export function useAuthActions() {
       setError(null);
       try {
         const result = await signupApi(name, email, password);
-        await loginStore(result.user, result.token, sanitizeRedirect(next));
+        // See signIn: clear before setting the user, not after — avoids
+        // cancelling the new Home screen's just-started queries mid-flight.
         queryClient.clear();
+        await loginStore(result.user, result.token, sanitizeRedirect(next));
         return true;
       } catch (e) {
         setError(getAuthErrorMessage(e, 'Could not create account'));

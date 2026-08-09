@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { AppText } from '@/src/components/ui/AppText';
 import { fonts } from '@/src/theme/typography';
 import type { Expense, ExpenseCreateInput, Group, SplitType, User } from '@/src/types/api';
@@ -11,15 +13,14 @@ import { TextField } from '@/src/components/ui/TextField';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { CurrencyPicker } from '@/src/components/ui/CurrencyPicker';
-import { CategoryIcon } from '@/src/components/expenses/CategoryIcon';
+import { SegmentedControl } from '@/src/components/ui/SegmentedControl';
+import { Avatar } from '@/src/components/ui/Avatar';
+import { CategoryField } from '@/src/components/expenses/CategoryField';
+import { DateField } from '@/src/components/expenses/DateField';
 import { todayISO } from '@/src/utils/format';
-import {
-  EXPENSE_CATEGORIES,
-  SPLIT_TYPE_OPTIONS,
-} from './constants';
+import { SPLIT_TYPE_OPTIONS } from './constants';
 import {
   buildExpensePayload,
-  shiftISODate,
   splitDetailsHint,
   type ExpenseFormValues,
 } from './validation';
@@ -133,8 +134,6 @@ export function ExpenseForm({
   const amount = useWatch({ control, name: 'amount' });
   const currency = useWatch({ control, name: 'currency' }) || 'INR';
   const isNegative = !!useWatch({ control, name: 'isNegative' });
-  const date = useWatch({ control, name: 'date' }) || todayISO();
-  const category = useWatch({ control, name: 'category' }) || '';
 
   useEffect(() => {
     onDescriptionAmountChange?.(description, amount, multiplePayers ? null : payerId);
@@ -183,57 +182,81 @@ export function ExpenseForm({
 
   return (
     <View style={{ gap: 4, paddingBottom: 28 }}>
-      <Controller
-        control={control}
-        name="description"
-        render={({ field: { onChange, value } }) => (
-          <TextField
-            label="Description"
-            value={value}
-            onChangeText={onChange}
-            placeholder="e.g. Dinner at Rustom's"
-            autoFocus={!isEditing}
-            error={errors.description?.message}
+      <Card elevated="md" padded={false} style={styles.hero}>
+        <LinearGradient
+          colors={[t.brand50, t.cardBg]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroFill}
+        >
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, value } }) => (
+              <TextField
+                testID="expense-description"
+                grouped
+                value={value}
+                onChangeText={onChange}
+                placeholder="What's this for?"
+                autoFocus={!isEditing}
+                error={errors.description?.message}
+                style={styles.heroDescription}
+              />
+            )}
           />
-        )}
-      />
+
+          <View style={[styles.heroDivider, { backgroundColor: t.cardBorder }]} />
+
+          <View style={styles.amountRow}>
+            <AppText muted variant="overline" style={styles.amountLabel}>
+              Amount
+            </AppText>
+            <View style={styles.amountInputRow}>
+              <Controller
+                control={control}
+                name="amount"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    testID="expense-amount"
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType="decimal-pad"
+                    placeholder="0.00"
+                    placeholderTextColor={t.textMuted}
+                    style={[styles.amountInput, { color: t.text, fontFamily: fonts.extrabold }]}
+                    accessibilityLabel="Amount"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="currency"
+                render={({ field: { onChange, value } }) => (
+                  <CurrencyPicker
+                    compact
+                    value={value}
+                    onChange={(code) => onChange(code)}
+                    includeCodes={[group.currency, expense?.original_currency || '']}
+                  />
+                )}
+              />
+            </View>
+            {errors.amount?.message ? (
+              <AppText variant="caption" style={{ color: t.danger, marginTop: 4 }}>
+                {errors.amount.message}
+              </AppText>
+            ) : errors.currency?.message ? (
+              <AppText variant="caption" style={{ color: t.danger, marginTop: 4 }}>
+                {errors.currency.message}
+              </AppText>
+            ) : null}
+          </View>
+        </LinearGradient>
+      </Card>
       {duplicateWarning ? (
         <AppText style={[styles.warn, { color: t.brand700 }]}>{duplicateWarning}</AppText>
       ) : null}
-
-      <View style={styles.row2}>
-        <View style={{ flex: 2 }}>
-          <Controller
-            control={control}
-            name="amount"
-            render={({ field: { onChange, value } }) => (
-              <TextField
-                label="Amount"
-                keyboardType="decimal-pad"
-                value={value}
-                onChangeText={onChange}
-                placeholder="0.00"
-                error={errors.amount?.message}
-              />
-            )}
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Controller
-            control={control}
-            name="currency"
-            render={({ field: { onChange, value } }) => (
-              <CurrencyPicker
-                label="Currency"
-                value={value}
-                onChange={(code) => onChange(code)}
-                error={errors.currency?.message}
-                includeCodes={[group.currency, expense?.original_currency || '']}
-              />
-            )}
-          />
-        </View>
-      </View>
 
       {needsFx ? (
         <Card style={{ gap: 8, backgroundColor: t.brand50 }}>
@@ -314,13 +337,14 @@ export function ExpenseForm({
                 key={m.id}
                 onPress={() => setPayerId(m.id)}
                 style={[
-                  styles.chip,
+                  styles.personChip,
                   {
                     backgroundColor: selected ? t.brand500 : t.cardBg,
                     borderColor: selected ? t.brand500 : t.cardBorder,
                   },
                 ]}
               >
+                <Avatar name={m.name} seed={m.id} size={22} avatarUrl={m.avatar_url} />
                 <AppText
                   style={{
                     color: selected ? t.btnPrimaryText : t.text,
@@ -350,7 +374,17 @@ export function ExpenseForm({
                     },
                   ]}
                 >
-                  <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>{youLabel(m)}</AppText>
+                  <View style={styles.memberRowLeft}>
+                    <Avatar name={m.name} seed={m.id} size={28} avatarUrl={m.avatar_url} />
+                    <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>
+                      {youLabel(m)}
+                    </AppText>
+                  </View>
+                  <Ionicons
+                    name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={20}
+                    color={selected ? t.brand500 : t.textMuted}
+                  />
                 </Pressable>
                 {selected ? (
                   <TextField
@@ -370,34 +404,12 @@ export function ExpenseForm({
       )}
 
       <AppText style={[styles.section, { color: t.text }]}>Split</AppText>
-      <View style={styles.chips}>
-        {SPLIT_TYPE_OPTIONS.map((st) => {
-          const selected = splitType === st.value;
-          return (
-            <Pressable
-              key={st.value}
-              onPress={() => setSplitType(st.value)}
-              style={[
-                styles.chip,
-                {
-                  backgroundColor: selected ? t.brand500 : t.cardBg,
-                  borderColor: selected ? t.brand500 : t.cardBorder,
-                },
-              ]}
-            >
-              <AppText
-                style={{
-                  color: selected ? t.btnPrimaryText : t.text,
-                  fontFamily: fonts.bold,
-                }}
-              >
-                {st.label}
-              </AppText>
-            </Pressable>
-          );
-        })}
-      </View>
-      <AppText style={{ color: t.textMuted, fontSize: 12, marginBottom: 8 }}>
+      <SegmentedControl
+        options={SPLIT_TYPE_OPTIONS.map((st) => ({ key: st.value, label: st.label }))}
+        value={splitType}
+        onChange={setSplitType}
+      />
+      <AppText style={{ color: t.textMuted, fontSize: 12, marginTop: -6, marginBottom: 8 }}>
         {splitDetailsHint(splitType)}
       </AppText>
 
@@ -431,10 +443,17 @@ export function ExpenseForm({
                   },
                 ]}
               >
-                <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>{youLabel(m)}</AppText>
-                <AppText style={{ color: selected ? t.brand600 : t.textMuted, fontFamily: fonts.bold }}>
-                  {selected ? 'On' : 'Off'}
-                </AppText>
+                <View style={styles.memberRowLeft}>
+                  <Avatar name={m.name} seed={m.id} size={28} avatarUrl={m.avatar_url} />
+                  <AppText style={{ color: t.text, fontFamily: fonts.semibold }}>
+                    {youLabel(m)}
+                  </AppText>
+                </View>
+                <Ionicons
+                  name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={20}
+                  color={selected ? t.brand500 : t.textMuted}
+                />
               </Pressable>
               {selected && splitType !== 'equal' ? (
                 <TextField
@@ -461,101 +480,27 @@ export function ExpenseForm({
       </View>
 
       <AppText style={[styles.section, { color: t.text }]}>Category</AppText>
-      <View style={styles.chips}>
-        <Pressable
-          onPress={() => setValue('category', '')}
-          style={[
-            styles.chip,
-            styles.catChip,
-            {
-              backgroundColor: !category ? t.brand50 : t.cardBg,
-              borderColor: !category ? t.brand500 : t.cardBorder,
-            },
-          ]}
-        >
-          <CategoryIcon category={null} size={28} />
-          <AppText
-            style={{
-              color: !category ? t.brand700 : t.text,
-              fontFamily: fonts.semibold,
-              fontSize: 13,
-            }}
-          >
-            None
-          </AppText>
-        </Pressable>
-        {EXPENSE_CATEGORIES.map((c) => {
-          const selected = category === c;
-          return (
-            <Pressable
-              key={c}
-              onPress={() => setValue('category', c)}
-              style={[
-                styles.chip,
-                styles.catChip,
-                {
-                  backgroundColor: selected ? t.brand50 : t.cardBg,
-                  borderColor: selected ? t.brand500 : t.cardBorder,
-                },
-              ]}
-            >
-              <CategoryIcon category={c} size={28} />
-              <AppText
-                style={{
-                  color: selected ? t.brand700 : t.text,
-                  fontFamily: fonts.semibold,
-                  fontSize: 13,
-                }}
-              >
-                {c}
-              </AppText>
-            </Pressable>
-          );
-        })}
-      </View>
+      <Controller
+        control={control}
+        name="category"
+        render={({ field: { onChange, value } }) => (
+          <CategoryField value={value || ''} onChange={onChange} />
+        )}
+      />
 
       <AppText style={[styles.section, { color: t.text }]}>Date</AppText>
       <Controller
         control={control}
         name="date"
         render={({ field: { onChange, value } }) => (
-          <TextField
-            label="YYYY-MM-DD"
-            value={value}
-            onChangeText={onChange}
-            error={errors.date?.message}
-            autoCapitalize="none"
-          />
+          <DateField value={value || todayISO()} onChange={onChange} />
         )}
       />
-      <View style={[styles.chips, { marginTop: 8 }]}>
-        {[
-          { label: 'Today', value: todayISO() },
-          { label: 'Yesterday', value: shiftISODate(todayISO(), -1) },
-        ].map((opt) => (
-          <Pressable
-            key={opt.label}
-            onPress={() => setValue('date', opt.value, { shouldValidate: true })}
-            style={[
-              styles.chipSm,
-              {
-                backgroundColor: date === opt.value ? t.brand500 : t.cardBg,
-                borderColor: t.cardBorder,
-              },
-            ]}
-          >
-            <AppText
-              style={{
-                color: date === opt.value ? t.btnPrimaryText : t.text,
-                fontFamily: fonts.bold,
-                fontSize: 12,
-              }}
-            >
-              {opt.label}
-            </AppText>
-          </Pressable>
-        ))}
-      </View>
+      {errors.date?.message ? (
+        <AppText variant="caption" style={{ color: t.danger, marginTop: 4 }}>
+          {errors.date.message}
+        </AppText>
+      ) : null}
 
       {formError ? (
         <AppText style={[styles.errorBox, { color: t.danger, backgroundColor: t.brand50 }]}>
@@ -565,6 +510,7 @@ export function ExpenseForm({
 
       <Button
         title={isEditing ? 'Save changes' : 'Add expense'}
+        testID="expense-submit"
         fullWidth={false}
         style={{ marginTop: 16 }}
         loading={submitting}
@@ -579,6 +525,19 @@ export function ExpenseForm({
 }
 
 const styles = StyleSheet.create({
+  hero: { overflow: 'hidden' },
+  heroFill: { padding: 16 },
+  heroDescription: { fontSize: 17, fontFamily: fonts.bold },
+  heroDivider: { height: StyleSheet.hairlineWidth, marginVertical: 14 },
+  amountRow: {},
+  amountLabel: { marginBottom: 6 },
+  amountInputRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  amountInput: {
+    flex: 1,
+    fontSize: 40,
+    letterSpacing: -1,
+    paddingVertical: 2,
+  },
   section: { fontSize: 15, fontFamily: fonts.extrabold, marginTop: 18, marginBottom: 8 },
   sectionHead: {
     marginTop: 18,
@@ -587,24 +546,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  label: { fontSize: 12, fontFamily: fonts.bold, marginBottom: 6 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  catChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
-  chip: {
+  personChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  chipSm: {
-    borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 24,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 8,
     minHeight: 44,
-    justifyContent: 'center',
   },
   memberRow: {
     borderWidth: 1,
@@ -616,7 +567,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  row2: { flexDirection: 'row', gap: 10, marginTop: 12, alignItems: 'flex-start' },
+  memberRowLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
   toggleRow: {
     marginTop: 12,
     borderWidth: 1,

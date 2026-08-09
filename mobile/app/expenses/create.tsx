@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { checkDuplicate, createExpense } from '@/src/api/expenses';
 import { getGroup } from '@/src/api/groups';
 import { useAuthStore } from '@/src/stores/authStore';
 import { Screen } from '@/src/components/ui/Screen';
 import { ErrorView } from '@/src/components/ui/StateViews';
 import { ListSkeleton } from '@/src/components/ui/ListSkeleton';
+import { SuccessOverlay } from '@/src/components/ui/SuccessOverlay';
 import { ExpenseForm } from '@/src/features/expenses/ExpenseForm';
 import { invalidateExpenseQueries } from '@/src/features/expenses/invalidate';
 import { ApiError, type ExpenseCreateInput } from '@/src/types/api';
@@ -19,6 +21,7 @@ export default function CreateExpenseScreen() {
   const router = useRouter();
   const qc = useQueryClient();
   const [dupWarning, setDupWarning] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const dupSeq = useRef(0);
   const [dupProbe, setDupProbe] = useState<{
     description: string;
@@ -89,7 +92,10 @@ export default function CreateExpenseScreen() {
     },
     onSuccess: async () => {
       await invalidateExpenseQueries(qc, groupId);
-      router.back();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+        () => undefined,
+      );
+      setShowSuccess(true);
     },
     onError: (e) => {
       if (String(e.message) === 'Cancelled') return;
@@ -137,6 +143,9 @@ export default function CreateExpenseScreen() {
           onSubmit={(payload) => mutation.mutate(payload)}
         />
       </Screen>
+      {showSuccess ? (
+        <SuccessOverlay label="Expense added" onDone={() => router.back()} />
+      ) : null}
     </>
   );
 }
