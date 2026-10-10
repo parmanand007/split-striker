@@ -1,5 +1,6 @@
 # Split Striker Wise — robots.txt
-# https://split-striker-wise.onrender.com
+# https://splitwise.thestrikerhub.com
+# Updated: 2026-10-10
 
 User-agent: *
 Allow: /
@@ -23,4 +24,4 @@ User-agent: Bingbot
 Allow: /
 Crawl-delay: 5
 
-Sitemap: https://split-striker-wise.onrender.com/sitemap.xml
+Sitemap: https://splitwise.thestrikerhub.com/sitemap.xml
