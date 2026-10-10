@@ -12,6 +12,9 @@ if DATABASE_URL:
     # SQLAlchemy requires postgresql:// not postgres://
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    # Force psycopg2 driver (SQLAlchemy 2.1+ defaults to psycopg3 otherwise)
+    if DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
     engine = create_engine(DATABASE_URL)
 else:
     # Local default: SQLite file next to the backend package
