@@ -26,6 +26,7 @@ app.add_middleware(
         "https://lining-roundish-freeload.ngrok-free.dev",
         "https://split-striker-1.onrender.com",
         "https://split-striker-wise.onrender.com",
+        "https://splitwise.thestrikerhub.com",
     ],
     # Expo web / LAN tooling may use ephemeral ports; regex covers local http origins.
     allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?",
